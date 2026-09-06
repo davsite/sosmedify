@@ -4,7 +4,7 @@ import {
   Tv, Camera, Music, Globe, Image as ImageIcon,
   Sun, Moon, Clock, Volume2, RefreshCw, Play, Sparkles,
   Clipboard, X, Zap, Film, ShieldCheck, ExternalLink, Activity,
-  Sliders, Smartphone, Monitor, Pause
+  Sliders, Smartphone, Monitor, Pause, Scissors
 } from 'lucide-react';
 
 const getBackendUrl = () => {

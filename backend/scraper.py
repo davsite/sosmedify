@@ -228,11 +228,15 @@ def _extract_douyin_share_page(video_id: str) -> Optional[Dict[str, Any]]:
                     if isinstance(v, dict) and "item_list" in v:
                         item = v["item_list"][0]
                         break
-                if not item and "loaderData" in data:
-                    try:
-                        item = list(data["loaderData"].values())[0]["videoDetail"]
-                    except Exception:
-                        pass
+                if not item and "loaderData" in data and isinstance(data["loaderData"], dict):
+                    for lv in data["loaderData"].values():
+                        if isinstance(lv, dict):
+                            if "videoDetail" in lv and isinstance(lv["videoDetail"], dict):
+                                item = lv["videoDetail"]
+                                break
+                            elif "itemInfo" in lv and isinstance(lv["itemInfo"], dict):
+                                item = lv["itemInfo"]
+                                break
 
                 if item:
                     video = item.get("video") or {}
@@ -606,6 +610,7 @@ def _extract_with_ytdlp(url: str, custom_headers: Optional[dict] = None) -> Dict
             "skip_download": True,
             "socket_timeout": 15,
             "retries": 3,
+            "format": "best/bestvideo+bestaudio",
             "check_formats": False,
         }
 
@@ -851,12 +856,16 @@ def extract_media_info(raw_url: str) -> Dict[str, Any]:
     elif "douyin.com" in url_low or "iesdouyin.com" in url_low:
         logger.info(f"[Platform Douyin] Memproses: {target_url}")
         vid_match = DOUYIN_ID_RE.search(target_url) or DOUYIN_ID_RE.search(clean_target)
-        douyin_urls = [target_url]
+        douyin_urls = []
         video_id = None
         if vid_match:
             video_id = vid_match.group(1)
-            douyin_urls.insert(0, f"https://www.douyin.com/video/{video_id}")
-            douyin_urls.append(f"https://www.iesdouyin.com/share/video/{video_id}/")
+            douyin_urls = [
+                f"https://www.douyin.com/video/{video_id}",
+                f"https://www.iesdouyin.com/share/video/{video_id}/",
+            ]
+        else:
+            douyin_urls = [target_url]
 
         # Jalur 1: TikWM API (Cepat, No-Watermark)
         for d_url in douyin_urls:
