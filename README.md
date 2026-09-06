@@ -8,7 +8,7 @@
   ### Production-Grade Universal Social Media Extractor & Frame-Accurate Video/Audio Trimmer
 
   <p align="center">
-    <em>Universal media ingestion engine with intelligent multi-tier anti-bot bypass, frame-accurate FFmpeg stream proxy, and responsive Web & Android Live Web Sync client.</em>
+    <em>Universal media ingestion engine with intelligent multi-tier anti-bot bypass, frame-accurate FFmpeg stream proxy, and responsive Web & Standalone Bundled Android APK client.</em>
   </p>
 
   <p align="center">
@@ -238,32 +238,34 @@ Digunakan oleh monitor infrastruktur (seperti Railway, Kubernetes, atau UptimeRo
 
 ## 📱 Aplikasi Android (APK) • Mobile Client
 
-Sosmedify dilengkapi dengan proyek aplikasi native di dalam folder [`android-app/`](file:///c:/Users/user/OneDrive/Dokumen/ALL%20sosmed%20by%20dav'site/android-app) berbasis **Live Web Sync Architecture**.
+Sosmedify dilengkapi dengan proyek aplikasi native di dalam folder [`android-app/`](file:///c:/Users/user/OneDrive/Dokumen/ALL%20sosmed%20by%20dav'site/android-app) berbasis **Standalone Embedded Architecture** (Aset antarmuka React 19 tertanam 100% di dalam file APK).
 
 ```
 📱 Perangkat Android Pengguna
    │
    ▼
-[ Android Native Shell (MainActivity.java) ]
-   ├── 🔄 SwipeRefreshLayout (Pull-to-Refresh)
-   ├── 🌐 Hardware-Accelerated WebView (Loads https://convertallsosmed.vercel.app)
-   ├── 🛡️ Back Button Navigation Handler (Double-press exit prevention)
+[ Android Standalone Native App (MainActivity.java) ]
+   ├── ⚡ Embedded Local Assets (WebViewAssetLoader)
+   │     └── assets/web/index.html (React 19 + Vite JS + CSS) — Pemuatan instan 0 detik
+   ├── 🔄 SwipeRefreshLayout (Pull-to-Refresh & Re-render)
+   ├── 🛡️ Back Button Navigation Handler (Double-press exit protection)
    ├── 📥 Native DownloadListener ──► Android DownloadManager
    │                                  └── Simpan langsung ke /sdcard/Download
-   └── 🌙 Offline Cache & Fallback Engine (offline.html)
+   └── ☁️ Background Cloud Media Engine ──► Railway FastAPI
+                                              └── yt-dlp & FFmpeg 7.x
 ```
 
 ### 📥 Unduh Berkas APK Siap Pasang
 
 | Nama Berkas | Versi | Ukuran | Link Unduhan Langsung | Keamanan |
 | :--- | :---: | :---: | :---: | :---: |
-| **`sosmedify-v1.0.0.apk`** | `v1.0.0` | **5.5 MB** | [**⬇️ Unduh APK Langsung**](https://github.com/davsite/sosmedify/releases/download/v1.0.0/sosmedify-v1.0.0.apk) | ![Verified](https://img.shields.io/badge/Security-Verified-10B981?style=flat-square) |
+| **`sosmedify-v1.0.0.apk`** | `v1.0.0` | **~7 MB** | [**⬇️ Unduh APK Langsung**](https://github.com/davsite/sosmedify/releases/download/v1.0.0/sosmedify-v1.0.0.apk) | ![Verified](https://img.shields.io/badge/Security-Verified-10B981?style=flat-square) |
 | **Halaman Semua Rilis** | `Semua` | - | [**🌐 Kunjungi GitHub Releases**](https://github.com/davsite/sosmedify/releases) | ![Releases](https://img.shields.io/badge/GitHub-Releases-blue?style=flat-square) |
-| **Build Artifacts CI/CD** | `Debug` | **4.5 MB** | [**📦 Unduh via GitHub Actions**](https://github.com/davsite/sosmedify/actions) | ![CI](https://img.shields.io/badge/Workflow-Pass-06B6D4?style=flat-square) |
+| **Build Artifacts CI/CD** | `Debug` | **~7 MB** | [**📦 Unduh via GitHub Actions**](https://github.com/davsite/sosmedify/actions) | ![CI](https://img.shields.io/badge/Workflow-Pass-06B6D4?style=flat-square) |
 
 > [!TIP]
-> **Keunggulan Live Web Sync**:
-> Aplikasi Android secara otomatis memuat antarmuka live terbaru dari domain Anda. Setiap kali Anda memperbarui kode di GitHub atau Vercel, pengguna aplikasi Android akan langsung menikmati fitur terbaru tanpa perlu memperbarui atau menginstal ulang file APK!
+> **Keunggulan Standalone Embedded Architecture**:
+> Aplikasi Android tidak lagi memuat web live online secara lambat, melainkan membuka seluruh antarmuka dan animasi secara instan dari penyimpanan internal ponsel melalui `WebViewAssetLoader`. Komunikasi scraping dan konversi video FFmpeg tetap dikerjakan dengan cepat oleh cloud server di latar belakang!
 
 ---
 

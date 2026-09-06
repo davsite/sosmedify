@@ -23,6 +23,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -36,13 +37,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.webkit.WebViewAssetLoader;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final String EMBEDDED_APP_URL = "https://appassets.androidplatform.net/assets/web/index.html";
 
     private WebView webView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar progressBar;
     private String targetUrl;
+    private WebViewAssetLoader assetLoader;
     private boolean isDoubleBackToExitPressedOnce = false;
 
     // File chooser callback untuk upload file jika diperlukan
@@ -56,8 +61,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Ambil URL target dari strings.xml (Bisa diganti kapan saja)
+        // Ambil URL target (default ke aset lokal yang tertanam di dalam APK)
         targetUrl = getString(R.string.web_url);
+
+        // Inisialisasi WebViewAssetLoader untuk melayani aset Frontend lokal (React 19) langsung dari APK
+        assetLoader = new WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+                .build();
 
         webView = findViewById(R.id.webView);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
@@ -163,21 +173,33 @@ public class MainActivity extends AppCompatActivity {
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                // Intersepsi dan layani aset frontend lokal dari assets/web/
+                WebResourceResponse response = assetLoader.shouldInterceptRequest(request.getUrl());
+                if (response != null) {
+                    return response;
+                }
+                return super.shouldInterceptRequest(view, request);
+            }
+
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
 
-                // Biarkan URL aplikasi dan backend tetap berada di dalam WebView
-                if (url.startsWith("http://") || url.startsWith("https://")) {
+                // Biarkan aset internal aplikasi dan komunikasi API tetap berada di dalam WebView
+                if (url.startsWith("https://appassets.androidplatform.net/")
+                        || url.contains("up.railway.app")
+                        || url.contains("/api/")) {
                     return false;
                 }
 
-                // Buka skema khusus (WhatsApp, Telegram, Tel, Mailto, dll) di aplikasi eksternal
+                // Buka skema khusus atau tautan eksternal di aplikasi lain / browser perangkat
                 try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, request.getUrl());
                     startActivity(intent);
                     return true;
                 } catch (Exception e) {
-                    return true;
+                    return false;
                 }
             }
 
@@ -233,15 +255,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadTargetUrl() {
-        if (isNetworkAvailable()) {
-            webView.loadUrl(targetUrl);
-        } else {
-            showOfflinePage();
-        }
+        // Muat aset frontend yang tertanam secara lokal di dalam APK (Tanpa memuat web live eksternal)
+        webView.loadUrl(EMBEDDED_APP_URL);
     }
 
     private void showOfflinePage() {
-        webView.loadUrl("file:///android_asset/offline.html");
+        webView.loadUrl("https://appassets.androidplatform.net/assets/offline.html");
     }
 
     /**
@@ -337,11 +356,7 @@ public class MainActivity extends AppCompatActivity {
         @JavascriptInterface
         public void retry() {
             runOnUiThread(() -> {
-                if (isNetworkAvailable()) {
-                    webView.loadUrl(targetUrl);
-                } else {
-                    Toast.makeText(context, "Koneksi internet masih belum tersedia.", Toast.LENGTH_SHORT).show();
-                }
+                loadTargetUrl();
             });
         }
     }
