@@ -33,22 +33,32 @@ def download_raw_media(direct_url: str, output_path: str, headers: Optional[dict
     logger.info(f"Mengunduh raw stream dari {direct_url[:60]}... ke {output_path}")
 
     download_ok = False
-    try:
-        with requests.get(direct_url, headers=req_headers, stream=True, timeout=30, verify=False) as response:
-            response.raise_for_status()
-            content_type = (response.headers.get("Content-Type") or "").lower()
-            if "text/html" in content_type or "application/json" in content_type:
-                raise Exception(f"Respon CDN bukan berupa media yang valid ({content_type}).")
+    mob_ua = "Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
+    header_attempts = [req_headers]
+    if "User-Agent" in req_headers and req_headers["User-Agent"] != mob_ua:
+        mob_h = dict(req_headers)
+        mob_h["User-Agent"] = mob_ua
+        header_attempts.append(mob_h)
 
-            with open(output_path, "wb") as f:
-                for chunk in response.iter_content(chunk_size=1024 * 1024):
-                    if chunk:
-                        f.write(chunk)
-            if os.path.exists(output_path) and os.path.getsize(output_path) > 1024:
-                download_ok = True
-    except Exception as e:
-        logger.warning(f"Direct stream download gagal ({e}), mencoba fallback yt-dlp...")
-        safe_remove(output_path)
+    for h in header_attempts:
+        try:
+            with requests.get(direct_url, headers=h, stream=True, timeout=40, verify=False, allow_redirects=True) as response:
+                if response.status_code not in (200, 206):
+                    continue
+                content_type = (response.headers.get("Content-Type") or "").lower()
+                if "text/html" in content_type or "application/json" in content_type:
+                    continue
+
+                with open(output_path, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=1024 * 512):
+                        if chunk:
+                            f.write(chunk)
+                if os.path.exists(output_path) and os.path.getsize(output_path) > 1024:
+                    download_ok = True
+                    break
+        except Exception as e:
+            logger.warning(f"Direct stream download attempt failed ({e}), mencoba strategi selanjutnya...")
+            safe_remove(output_path)
 
     if not download_ok:
         fallback_targets = []

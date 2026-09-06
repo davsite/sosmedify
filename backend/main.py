@@ -253,7 +253,7 @@ def stream_video_proxy(url: str, request: Request, vid: Optional[str] = None):
 
         for key, value in client_req.headers.items():
             k_low = key.lower()
-            if k_low in ("content-type", "content-range", "content-length", "last-modified", "etag"):
+            if k_low in ("content-type", "content-range", "last-modified", "etag"):
                 resp_headers[key] = value
 
         ct = (resp_headers.get("content-type") or resp_headers.get("Content-Type") or "").lower()
@@ -261,8 +261,8 @@ def stream_video_proxy(url: str, request: Request, vid: Optional[str] = None):
             resp_headers["Content-Type"] = "video/mp4"
 
         status_code = client_req.status_code
-        # Pastikan Content-Range selalu ada jika status 206 atau jika range_header bytes=0- dikirim
-        cl = resp_headers.get("content-length") or resp_headers.get("Content-Length")
+        # Ambil content-length dari CDN untuk membangun Content-Range jika belum ada
+        cl = client_req.headers.get("content-length") or client_req.headers.get("Content-Length")
         has_cr = any(k.lower() == "content-range" for k in resp_headers.keys())
         
         if status_code == 200 and range_header and cl and str(cl).isdigit() and not has_cr:
@@ -272,6 +272,11 @@ def stream_video_proxy(url: str, request: Request, vid: Optional[str] = None):
         elif status_code == 206 and not has_cr and cl and str(cl).isdigit():
             total = int(cl)
             resp_headers["Content-Range"] = f"bytes 0-{total - 1}/{total}"
+
+        # JANGAN sertakan Content-Length dalam StreamingResponse agar Uvicorn tidak melempar
+        # 'RuntimeError: Response content longer than Content-Length' akibat perbedaan chunking/dekompresi
+        resp_headers.pop("content-length", None)
+        resp_headers.pop("Content-Length", None)
 
         if status_code not in (200, 206, 304):
             status_code = 206 if range_header else 200

@@ -254,6 +254,7 @@ def _extract_douyin_share_page(video_id: str) -> Optional[Dict[str, Any]]:
                             "thumbnail": cover[0] if cover else None,
                             "duration": duration or 60,
                             "direct_url": play_url,
+                            "canonical_url": f"https://www.douyin.com/video/{video_id}",
                             "qualities": _quality_ladder([]),
                             "stream_headers": {
                                 "User-Agent": MOBILE_UA,
@@ -450,6 +451,121 @@ async def _scrape_with_playwright_stealth(url: str, platform: str) -> Dict[str, 
     }
 
 
+def _extract_youtube_fallback(url: str) -> Optional[Dict[str, Any]]:
+    """
+    Fallback extractor untuk YouTube ketika IP datacenter (seperti Railway) terkena bot protection.
+    Memanfaatkan multi-instance Invidious API dan Cobalt API publik yang terdistribusi.
+    """
+    logger.info(f"[YouTube Fallback] Mencoba fallback API terdistribusi untuk: {url}")
+    
+    # Ekstraksi YouTube Video ID
+    yt_id_match = re.search(r"(?:v=|\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})", url)
+    video_id = yt_id_match.group(1) if yt_id_match else None
+    
+    # 1. Coba Invidious API instances jika video_id ditemukan
+    if video_id:
+        invidious_instances = [
+            "https://inv.nadeko.net",
+            "https://invidious.nerdvpn.de",
+            "https://yewtu.be",
+            "https://invidious.jing.rocks",
+            "https://invidious.privacyredirect.com",
+        ]
+        for inv_base in invidious_instances:
+            api_url = f"{inv_base}/api/v1/videos/{video_id}"
+            try:
+                resp = requests.get(api_url, headers={"User-Agent": DESKTOP_UA}, timeout=6)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    title = data.get("title", "YouTube Video")
+                    duration = int(data.get("lengthSeconds") or 60)
+                    thumb_list = data.get("videoThumbnails") or []
+                    thumb = thumb_list[0].get("url") if thumb_list else None
+
+                    # Prioritaskan format gabungan (video + audio)
+                    streams = data.get("formatStreams") or []
+                    chosen_url = None
+                    for s in streams:
+                        if s.get("url") and s.get("container") in ("mp4", "webm"):
+                            chosen_url = s["url"]
+                            break
+                    
+                    if not chosen_url and streams:
+                        chosen_url = streams[0].get("url")
+
+                    # Jika hanya ada adaptiveFormats (video-only)
+                    audio_url = None
+                    adaptive = data.get("adaptiveFormats") or []
+                    if not chosen_url and adaptive:
+                        v_cands = [f for f in adaptive if f.get("type", "").startswith("video") and f.get("url")]
+                        a_cands = [f for f in adaptive if f.get("type", "").startswith("audio") and f.get("url")]
+                        if v_cands:
+                            v_cands.sort(key=lambda x: int(x.get("resolution", "0x0").split("x")[-1] or 0))
+                            chosen_url = v_cands[-1]["url"]
+                        if a_cands:
+                            audio_url = a_cands[-1]["url"]
+
+                    if chosen_url:
+                        logger.info(f"[YouTube Fallback] Berhasil via Invidious ({inv_base})")
+                        return {
+                            "title": title,
+                            "thumbnail": thumb,
+                            "duration": duration,
+                            "direct_url": chosen_url,
+                            "audio_url": audio_url,
+                            "qualities": [
+                                {"label": "720p HD", "height": 720},
+                                {"label": "480p SD", "height": 480},
+                                {"label": "360p SD", "height": 360}
+                            ],
+                            "stream_headers": {"User-Agent": DESKTOP_UA, "Referer": "https://www.youtube.com/"}
+                        }
+            except Exception as e:
+                logger.debug(f"Invidious instance {inv_base} failed: {e}")
+                continue
+
+    # 2. Coba Cobalt API instances
+    cobalt_instances = [
+        "https://api.cobalt.tools",
+        "https://cobalt-api.kwiatekm.tokyo",
+        "https://cobalt.api.redstream.org"
+    ]
+    for c_base in cobalt_instances:
+        try:
+            c_url = f"{c_base}/"
+            resp = requests.post(
+                c_url,
+                json={"url": url},
+                headers={
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "User-Agent": DESKTOP_UA
+                },
+                timeout=8
+            )
+            if resp.status_code == 200:
+                c_data = resp.json()
+                media_url = c_data.get("url")
+                if media_url:
+                    logger.info(f"[YouTube Fallback] Berhasil via Cobalt ({c_base})")
+                    return {
+                        "title": "YouTube Video",
+                        "thumbnail": None,
+                        "duration": 60,
+                        "direct_url": media_url,
+                        "qualities": [
+                            {"label": "720p HD", "height": 720},
+                            {"label": "480p SD", "height": 480}
+                        ],
+                        "stream_headers": {"User-Agent": DESKTOP_UA}
+                    }
+        except Exception as e:
+            logger.debug(f"Cobalt instance {c_base} failed: {e}")
+            continue
+
+    return None
+
+
 # ============================================================================
 # 5. YT-DLP EXTRACTION ENGINE (YouTube, IG, FB, X, TikTok)
 # ============================================================================
@@ -461,11 +577,11 @@ def _extract_with_ytdlp(url: str, custom_headers: Optional[dict] = None) -> Dict
     is_yt = "youtube.com" in url.lower() or "youtu.be" in url.lower()
     client_strategies = (
         [
+            ["ios"],
+            ["mweb"],
             ["tv_embedded", "android_vr"],
-            ["android", "ios"],
-            ["tv_embedded", "android"],
-            ["android_creator", "web_creator"],
-            ["web", "mweb"],
+            ["android"],
+            ["web_creator"],
             None
         ]
         if is_yt
@@ -497,6 +613,13 @@ def _extract_with_ytdlp(url: str, custom_headers: Optional[dict] = None) -> Dict
             ydl_opts["extractor_args"] = {
                 "youtube": {
                     "player_client": clients,
+                    "player_skip": ["webpage", "configs"],
+                }
+            }
+        elif is_yt:
+            ydl_opts["extractor_args"] = {
+                "youtube": {
+                    "player_skip": ["webpage", "configs"],
                 }
             }
 
@@ -559,6 +682,11 @@ def _extract_with_ytdlp(url: str, custom_headers: Optional[dict] = None) -> Dict
             logger.warning(f"YouTube extractor strategy {clients} failed: {e}. Trying fallback...")
             continue
     else:
+        if is_yt:
+            fallback = _extract_youtube_fallback(url)
+            if fallback:
+                return fallback
+
         if last_error:
             err_msg = str(last_error)
             if "Sign in to confirm you’re not a bot" in err_msg or "bot" in err_msg.lower():
@@ -807,7 +935,14 @@ def extract_media_info(raw_url: str) -> Dict[str, Any]:
     elif "youtube.com" in url_low or "youtu.be" in url_low:
         logger.info(f"[Platform YouTube] Memproses: {target_url}")
         headers = {"User-Agent": DESKTOP_UA, "Referer": "https://www.youtube.com/"}
-        return _extract_with_ytdlp(target_url, custom_headers=headers)
+        try:
+            return _extract_with_ytdlp(target_url, custom_headers=headers)
+        except Exception as e:
+            logger.warning(f"yt-dlp failed for YouTube: {e}. Attempting fallback...")
+            fb = _extract_youtube_fallback(target_url)
+            if fb:
+                return fb
+            raise e
 
     # --- DEFAULT GENERIC ---
     else:

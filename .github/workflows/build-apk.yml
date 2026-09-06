@@ -34,7 +34,7 @@ jobs:
         working-directory: ./frontend
         run: |
           npm ci
-          npm run build
+          VITE_BASE_PATH='./' npm run build
           mkdir -p ../android-app/app/src/main/assets/web
           cp -r dist/* ../android-app/app/src/main/assets/web/
 
