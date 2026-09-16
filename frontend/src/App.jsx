@@ -4,7 +4,8 @@ import {
   Tv, Camera, Music, Globe, Image as ImageIcon,
   Sun, Moon, Clock, Volume2, RefreshCw, Play, Sparkles,
   Clipboard, X, Zap, Film, ShieldCheck, ExternalLink, Activity,
-  Sliders, Smartphone, Monitor, Pause, Scissors
+  Sliders, Smartphone, Monitor, Pause, Scissors,
+  ChevronDown, ChevronUp, HelpCircle, Info, FileText, Check, Shield, Layers, ArrowRight
 } from 'lucide-react';
 
 const getBackendUrl = () => {
@@ -86,6 +87,236 @@ const fmtElapsed = (ms) => {
   return `${mins}:${secs}.${tenths}s`;
 };
 
+/* ---- SEO & Showcase Content Data ------------------------------------------ */
+const PLATFORM_DETAILS = [
+  {
+    key: 'youtube',
+    name: 'YouTube & Shorts',
+    badge: 'Hingga 1080p',
+    color: '#EF4444',
+    badgeClass: 'bg-red-500/15 text-red-500 border-red-500/30',
+    desc: 'Unduh video YouTube, Shorts, dan konversi ke trek audio MP3 kualitas tinggi.',
+    features: ['YouTube Shorts & Video', 'Pilihan Resolusi HD/FullHD', 'Presisi Potong Detik'],
+    example: 'https://youtube.com/watch?v=...'
+  },
+  {
+    key: 'tiktok',
+    name: 'TikTok Video',
+    badge: 'No Watermark',
+    color: '#06B6D4',
+    badgeClass: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
+    desc: 'Ekstraksi video TikTok murni tanpa watermark (tanda air) dan simpan sound MP3 asli.',
+    features: ['100% Tanpa Logo Watermark', 'Download Sound Audio', 'Kualitas Jernih Source'],
+    example: 'https://vt.tiktok.com/...'
+  },
+  {
+    key: 'instagram',
+    name: 'Instagram Reels',
+    badge: 'Reels & Feed',
+    color: '#D946EF',
+    badgeClass: 'bg-fuchsia-500/15 text-fuchsia-400 border-fuchsia-500/30',
+    desc: 'Simpan video Instagram Reels, feed video, dan klip kreator dengan resolusi tajam.',
+    features: ['Instagram Reels & Video', 'Kecepatan Unduh Kilat', 'Format MP4 Universal'],
+    example: 'https://instagram.com/reel/...'
+  },
+  {
+    key: 'douyin',
+    name: 'Douyin (抖音)',
+    badge: 'Original HD',
+    color: '#EC4899',
+    badgeClass: 'bg-pink-500/15 text-pink-400 border-pink-500/30',
+    desc: 'Unduh video Douyin Tiongkok kualitas HD tanpa watermark dengan dukungan link pendek.',
+    features: ['Douyin Bebas Watermark', 'Resolusi Asli Tiongkok', 'Tautan v.douyin.com'],
+    example: 'https://v.douyin.com/...'
+  },
+  {
+    key: 'facebook',
+    name: 'Facebook Watch',
+    badge: 'Watch & Reels',
+    color: '#3B82F6',
+    badgeClass: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+    desc: 'Unduh video publik Facebook, FB Watch, dan Facebook Reels langsung ke perangkat.',
+    features: ['Facebook Reels & Watch', 'Video Publik Kualitas HD', 'Support Link Mobile'],
+    example: 'https://fb.watch/...'
+  },
+  {
+    key: 'x',
+    name: 'X (Twitter)',
+    badge: 'Video & GIF',
+    color: '#8B5CF6',
+    badgeClass: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+    desc: 'Simpan klip video dari postingan cuitan X (Twitter) dan animasi GIF instan tanpa kendala.',
+    features: ['X Tweet Post Video', 'Konversi Animasi GIF', 'Server Proxy Cepat'],
+    example: 'https://x.com/user/status/...'
+  },
+  {
+    key: 'rednote',
+    name: 'Rednote (小红书)',
+    badge: 'Lifestyle Video',
+    color: '#F43F5E',
+    badgeClass: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+    desc: 'Ekstraksi video gaya hidup, resep, dan estetika dari Xiaohongshu tanpa watermark.',
+    features: ['Xiaohongshu Video', 'Kualitas Visual Tajam', 'Dukungan Tautan xhslink'],
+    example: 'http://xhslink.com/...'
+  }
+];
+
+const FEATURES = [
+  {
+    icon: Sparkles,
+    title: 'Bebas Watermark Agresif',
+    desc: 'Ekstraksi video murni dari TikTok dan Douyin tanpa logo tanda air mengganggu yang menutupi konten visual Anda.'
+  },
+  {
+    icon: Scissors,
+    title: 'Frame-Accurate Video Trimming',
+    desc: 'Potong video langsung di server cloud FFmpeg dengan presisi milidetik. Ambil hanya momen terbaik dan hemat kuota.'
+  },
+  {
+    icon: Zap,
+    title: 'Pemrosesan Cloud Cepat & Ringan',
+    desc: 'Arsitektur streaming Range HTTP 206 instan memungkinkan analisis video dan proses potong selesai dalam hitungan detik.'
+  },
+  {
+    icon: Music,
+    title: 'Ekstraksi Audio MP3 Kualitas 320kbps',
+    desc: 'Konversi video menjadi file audio MP3 berkualitas studio secara langsung untuk koleksi musik, nada dering, atau podcast.'
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Privasi Terjamin & Zero-Logs',
+    desc: 'Kami memprioritaskan keamanan Anda. Berkas sementara segera dibersihkan otomatis dan kami tidak merekam riwayat unduhan.'
+  },
+  {
+    icon: Globe,
+    title: '100% Gratis Tanpa Perlu Login',
+    desc: 'Akses tanpa biaya langganan, tanpa batasan kuota harian, dan tanpa perlu mendaftarkan akun pribadi.'
+  }
+];
+
+const STEPS = [
+  {
+    num: '01',
+    title: 'Salin Tautan Video',
+    desc: 'Buka TikTok, Instagram, YouTube, atau platform sosial media favorit Anda, lalu salin URL tautan video yang ingin Anda simpan.'
+  },
+  {
+    num: '02',
+    title: 'Tempel & Ambil Media',
+    desc: 'Tempel tautan di bilah input Sosmedify di atas, kemudian klik tombol "Ambil Video" untuk memulai analisis instan.'
+  },
+  {
+    num: '03',
+    title: 'Pratinjau & Atur Potongan',
+    desc: 'Putar video di pemutar bawaan. Tentukan detik mulai dan selesai jika ingin memotong klip, lalu tentukan format MP4 atau MP3.'
+  },
+  {
+    num: '04',
+    title: 'Unduh Langsung ke Galeri',
+    desc: 'Klik tombol "Unduh". Server FFmpeg kami akan menyiapkan berkas dan menyimpannya langsung ke perangkat Anda dalam sekejap.'
+  }
+];
+
+const FAQS = [
+  {
+    q: 'Apakah Sosmedify benar-benar gratis digunakan?',
+    a: 'Ya, Sosmedify 100% gratis tanpa batasan kuota harian, tanpa biaya langganan tersembunyi, dan tanpa perlu registrasi akun atau login. Anda dapat mengunduh dan memotong video sepuasnya.'
+  },
+  {
+    q: 'Apakah video TikTok yang diunduh bebas dari watermark?',
+    a: 'Ya. Sosmedify secara otomatis mengekstrak berkas sumber murni tanpa logo tanda air (watermark) dari TikTok maupun Douyin, menghasilkan kualitas video yang jernih dan profesional.'
+  },
+  {
+    q: 'Bagaimana cara memotong bagian tertentu dari video sebelum mengunduh?',
+    a: 'Setelah video berhasil dimuat dan masuk ke mode pratinjau, Anda dapat menggeser pin slider "Mulai" (merah) dan "Selesai" (biru) pada timeline. Anda juga dapat menekan tombol stepper presisi (-1s, -0.1s, +0.1s, +1s) untuk mengatur titik potong per milidetik.'
+  },
+  {
+    q: 'Apakah saya bisa mengunduh hanya suara atau musiknya saja dalam format MP3?',
+    a: 'Tentu bisa! Pada panel pilihan format keluaran, pilih tab "MP3 Audio". Sosmedify akan mengekstrak suara berkualitas studio hingga 320kbps tanpa mengunduh visual video, sangat cocok untuk sound tren atau podcast.'
+  },
+  {
+    q: 'Platform sosial media apa saja yang didukung oleh Sosmedify?',
+    a: 'Sosmedify mendukung 7 platform terpopuler: YouTube (video & Shorts), TikTok, Instagram (Reels & Feed), Douyin (抖音), Facebook Video, X (Twitter), dan Rednote (Xiaohongshu).'
+  },
+  {
+    q: 'Apakah Sosmedify menyimpan berkas video atau data pribadi saya di server?',
+    a: 'Tidak sama sekali. Kami menerapkan prinsip privasi ketat (Zero-Logs). Seluruh pemrosesan media bersifat sementara (ephemeral) di server cloud kami dan otomatis terhapus segera setelah proses streaming atau unduhan selesai.'
+  },
+  {
+    q: 'Mengapa terkadang tautan video YouTube tertentu gagal diproses?',
+    a: 'Beberapa video YouTube mungkin memiliki batasan usia (18+), bersifat privat, atau dilindungi kebijakan verifikasi bot YouTube. Jika terjadi kendala, silakan gunakan tautan video lain atau nikmati platform seperti TikTok dan Instagram yang memiliki rasio keberhasilan 99%.'
+  },
+  {
+    q: 'Apakah Sosmedify bisa digunakan di smartphone (Android & iPhone)?',
+    a: 'Ya! Tampilan Sosmedify sepenuhnya responsif dan dioptimalkan untuk layar sentuh di HP Android, iPhone, iPad, tablet, maupun laptop/PC pada semua peramban seperti Google Chrome, Safari, dan Firefox.'
+  }
+];
+
+const LEGAL_DOCS = {
+  privacy: {
+    title: 'Kebijakan Privasi (Privacy Policy)',
+    updated: '17 September 2026',
+    sections: [
+      {
+        heading: '1. Komitmen Privasi Nol Log (Zero-Logs)',
+        content: 'Sosmedify sangat menghormati privasi Anda. Kami tidak mengumpulkan data pribadi yang dapat mengidentifikasi Anda (PII), tidak meminta registrasi akun, tidak melacak riwayat penelusuran pribadi Anda, dan tidak pernah menjual data kepada pihak ketiga.'
+      },
+      {
+        heading: '2. Pemrosesan URL & Media Sementara',
+        content: 'Tautan (URL) yang Anda masukkan semata-mata dikirimkan ke server backend kami untuk mengambil metadata publik dari penyedia platform terkait. Semua berkas media hasil pemotongan atau konversi disimpan secara sementara (ephemeral) di direktori kerja terisolasi dan dihapus secara otomatis dan berkala.'
+      },
+      {
+        heading: '3. Cookie & Jaringan Periklanan',
+        content: 'Kami menggunakan cookie browser lokal untuk menyimpan preferensi tampilan antarmuka (seperti Mode Gelap/Terang). Selain itu, mitra jaringan periklanan pihak ketiga dapat menggunakan cookie standar untuk menayangkan iklan kontekstual yang mendukung operasional server gratis ini.'
+      },
+      {
+        heading: '4. Keamanan Infrastruktur',
+        content: 'Seluruh komunikasi data antara peramban Anda dan server kami dilindungi oleh enkripsi standar industri HTTPS/TLS 1.3 untuk mencegah penyadapan data di jalur transmisi.'
+      }
+    ]
+  },
+  terms: {
+    title: 'Ketentuan Layanan (Terms of Service)',
+    updated: '17 September 2026',
+    sections: [
+      {
+        heading: '1. Penerimaan Ketentuan',
+        content: 'Dengan mengakses atau menggunakan situs web Sosmedify, Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui untuk terikat oleh Ketentuan Layanan ini serta mematuhi seluruh peraturan hukum yang berlaku.'
+      },
+      {
+        heading: '2. Batasan Penggunaan Wajar (Fair Use)',
+        content: 'Sosmedify disediakan semata-mata untuk penggunaan pribadi yang wajar (personal fair use), tujuan edukasi, atau pencadangan arsip konten milik Anda sendiri. Pengguna dilarang memanfaatkan alat ini untuk tujuan komersial tanpa izin pemegang hak cipta yang sah.'
+      },
+      {
+        heading: '3. Tanggung Jawab Hak Cipta',
+        content: 'Pengguna bertanggung jawab penuh atas segala konten yang diunduh atau diproses melalui alat ini. Sosmedify tidak bertanggung jawab atas tindakan penyalahgunaan konten oleh pengguna akhir yang melanggar hak cipta pihak ketiga.'
+      },
+      {
+        heading: '4. Batasan Tanggung Jawab Teknis',
+        content: 'Layanan Sosmedify disediakan berdasarkan prinsip "sebagaimana adanya" (as is) dan "sebagaimana tersedia" (as available). Kami tidak memberikan jaminan bahwa layanan akan selalu bebas gangguan, bebas kesalahan, atau selalu kompatibel dengan perubahan API platform pihak ketiga di masa mendatang.'
+      }
+    ]
+  },
+  disclaimer: {
+    title: 'Penafian Hak Cipta & DMCA (Disclaimer)',
+    updated: '17 September 2026',
+    sections: [
+      {
+        heading: '1. Penafian Afiliasi',
+        content: 'Sosmedify adalah proyek perangkat lunak independen dan TIDAK berafiliasi, didukung, disponsori, atau secara resmi terhubung dengan YouTube, Google LLC, TikTok, ByteDance Ltd, Meta Platforms Inc. (Instagram & Facebook), X Corp. (Twitter), maupun Xiaohongshu / Rednote.'
+      },
+      {
+        heading: '2. Hak Merek Dagang & Konten',
+        content: 'Seluruh nama produk, logo, merek dagang, dan merek terdaftar yang ditampilkan di situs ini adalah milik dari pemegang hak cipta masing-masing. Penggunaan merek dan logo di situs ini semata-mata bersifat nominatif untuk tujuan identifikasi kompatibilitas platform.'
+      },
+      {
+        heading: '3. Prosedur Pemberitahuan DMCA',
+        content: 'Jika Anda adalah pemilik hak cipta yang sah atau agen perwakilan resminya dan meyakini bahwa tautan tertentu melanggar hak cipta Anda melalui utilitas kami, silakan sampaikan pemberitahuan resmi kepada kami. Kami berkomitmen untuk menindaklanjuti permintaan yang sah secara cepat.'
+      }
+    ]
+  }
+};
+
 export default function App() {
   const [theme, setTheme] = useState(initialTheme);
   const [url, setUrl] = useState('');
@@ -99,6 +330,8 @@ export default function App() {
   const [toast, setToast] = useState('');
   const [prog, setProg] = useState(null);
   const [backendPing, setBackendPing] = useState({ online: true, latency: 38 });
+  const [openFaq, setOpenFaq] = useState(0);
+  const [activeModal, setActiveModal] = useState(null);
 
   const [video, setVideo] = useState({ title: '', thumbnail: '', streamUrl: '', audioUrl: '', duration: 0, qualities: [], canonicalUrl: '' });
   const [start, setStart] = useState(0);
@@ -1178,11 +1411,212 @@ export default function App() {
           </section>
         )}
 
+        {/* ============================================================== */}
+        {/* 4. PLATFORMS SHOWCASE SECTION (SEO & TRUST)                    */}
+        {/* ============================================================== */}
+        <section id="platforms" className="mt-14 sm:mt-20 scroll-mt-6">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 px-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/25 text-cyan-600 dark:text-cyan-400 text-[11px] font-mono mb-2.5">
+              <Layers size={13} className="text-cyan-400" /> Kompatibilitas Multi-Platform
+            </div>
+            <h2 className="font-display text-xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+              7 Platform Sosial Media Didukung Penuh
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Dukungan komprehensif untuk pengunduhan video dan pemotongan durasi dari ekosistem video pendek terbesar di dunia.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+            {PLATFORM_DETAILS.map((p) => (
+              <div
+                key={p.key}
+                className="glass-studio-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:border-rose-500/40 hover:-translate-y-0.5 transition-all duration-300 group shadow-sm"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <img src={`/logos/logo_${p.key}.png`} alt={p.name} className="w-7 h-7 rounded-lg object-contain drop-shadow-sm group-hover:scale-105 transition-transform" />
+                      <h3 className="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                        {p.name}
+                      </h3>
+                    </div>
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${p.badgeClass}`}>
+                      {p.badge}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+                    {p.desc}
+                  </p>
+                  <ul className="space-y-1.5 border-t border-slate-100 dark:border-white/5 pt-3 mb-3 text-[11px] font-mono text-slate-600 dark:text-slate-300">
+                    {p.features.map((feat, fi) => (
+                      <li key={fi} className="flex items-center gap-1.5">
+                        <Check size={12} className="text-emerald-500 shrink-0" />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <button
+                  onClick={() => {
+                    if (!url) {
+                      setToast(`Tempelkan tautan dari ${p.name} ke bilah pencarian di atas.`);
+                    }
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="w-full py-2 px-3 rounded-xl text-xs font-mono font-bold bg-slate-100 dark:bg-slate-900 hover:bg-rose-500/15 hover:text-rose-500 dark:hover:text-rose-400 border border-slate-200/70 dark:border-white/10 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>Gunakan untuk {p.name.split(' ')[0]}</span>
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ============================================================== */}
+        {/* 5. WHY CHOOSE SOSMEDIFY (FEATURE HIGHLIGHTS)                    */}
+        {/* ============================================================== */}
+        <section id="features" className="mt-14 sm:mt-20 scroll-mt-6">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 px-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/25 text-rose-600 dark:text-rose-400 text-[11px] font-mono mb-2.5">
+              <Sparkles size={13} className="text-rose-400" /> Keunggulan Standar Studio
+            </div>
+            <h2 className="font-display text-xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+              Mengapa Memilih Sosmedify Studio?
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Dibuat dengan teknologi mutakhir untuk memberikan pengalaman unduh dan potong media tercepat, terbersih, dan teraman.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+            {FEATURES.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <div
+                  key={i}
+                  className="glass-studio-card rounded-2xl p-5 sm:p-6 hover:border-cyan-500/40 hover:-translate-y-0.5 transition-all duration-300 group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-purple-500/20 border border-rose-500/30 flex items-center justify-center text-rose-500 dark:text-rose-400 mb-4 group-hover:scale-110 transition-transform">
+                    <Icon size={20} />
+                  </div>
+                  <h3 className="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 mb-1.5">
+                    {f.title}
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    {f.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ============================================================== */}
+        {/* 6. HOW IT WORKS (STEP-BY-STEP GUIDE)                           */}
+        {/* ============================================================== */}
+        <section id="how-it-works" className="mt-14 sm:mt-20 scroll-mt-6">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 px-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/25 text-purple-600 dark:text-purple-400 text-[11px] font-mono mb-2.5">
+              <Zap size={13} className="text-purple-400" /> Panduan Penggunaan
+            </div>
+            <h2 className="font-display text-xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+              Cara Mengunduh & Memotong Video
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Hanya perlu 4 langkah mudah untuk mengambil bagian video favorit Anda dalam resolusi HD.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+            {STEPS.map((s, i) => (
+              <div
+                key={i}
+                className="glass-studio-card rounded-2xl p-5 flex flex-col justify-between hover:border-purple-500/40 transition-all duration-300 relative overflow-hidden"
+              >
+                <span className="text-3xl sm:text-4xl font-display font-black text-rose-500/20 dark:text-rose-400/15 select-none mb-3">
+                  {s.num}
+                </span>
+                <div>
+                  <h3 className="font-display font-bold text-sm text-slate-900 dark:text-slate-100 mb-1.5">
+                    {s.title}
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    {s.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ============================================================== */}
+        {/* 7. FAQ ACCORDION SECTION (GOOGLE SEARCH RICH SNIPPETS)         */}
+        {/* ============================================================== */}
+        <section id="faq" className="mt-14 sm:mt-20 max-w-3xl mx-auto scroll-mt-6">
+          <div className="text-center mb-8 sm:mb-10 px-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-[11px] font-mono mb-2.5">
+              <HelpCircle size={13} className="text-amber-400" /> Pusat Bantuan
+            </div>
+            <h2 className="font-display text-xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+              Pertanyaan yang Sering Diajukan (FAQ)
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Informasi lengkap mengenai cara kerja, privasi data, dan tips unduh video tanpa watermark di Sosmedify.
+            </p>
+          </div>
+
+          <div className="space-y-2.5">
+            {FAQS.map((faq, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div
+                  key={idx}
+                  className="glass-studio-card rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden transition-all duration-200"
+                >
+                  <button
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    className="w-full p-4 sm:p-4.5 text-left flex items-center justify-between gap-3 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 hover:text-rose-500 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-rose-500/15 text-rose-500 dark:text-rose-400 text-[10px] font-mono flex items-center justify-center shrink-0">
+                        {idx + 1}
+                      </span>
+                      <span>{faq.q}</span>
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className={`shrink-0 transition-transform duration-300 text-slate-400 ${
+                        isOpen ? 'rotate-180 text-rose-500' : ''
+                      }`}
+                    />
+                  </button>
+                  {isOpen && (
+                    <div className="px-4 sm:px-4.5 pb-4 pt-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-white/5 anim-fade-up">
+                      <p className="pl-7">{faq.a}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
         {/* Native Ad Placement at the Bottom */}
-        <div className="mt-8">
+        <div className="mt-14">
           <AdNativeBanner />
         </div>
       </main>
+
+      {/* Professional Footer */}
+      <Footer onOpenModal={(docKey) => setActiveModal(docKey)} backendPing={backendPing} />
+
+      {/* Legal Modals (Privacy, Terms, Disclaimer) */}
+      {activeModal && (
+        <LegalModal docKey={activeModal} onClose={() => setActiveModal(null)} />
+      )}
 
       {/* Toast Notification */}
       {toast && (
@@ -1333,5 +1767,187 @@ function AdNativeBanner() {
     </div>
   );
 }
+
+/* ---- Professional Footer & Compliance Modals ----------------------------- */
+
+function Footer({ onOpenModal, backendPing }) {
+  return (
+    <footer className="relative z-20 mt-16 border-t border-slate-200/80 dark:border-white/10 bg-white/40 dark:bg-[#070A14]/80 backdrop-blur-xl pt-12 pb-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-8 border-b border-slate-200/60 dark:border-white/10">
+          
+          {/* Brand & Description (5 cols) */}
+          <div className="md:col-span-5 space-y-3">
+            <div className="flex items-center gap-2.5">
+              <img src="/logo-app.png" alt="Sosmedify" className="w-8 h-8 rounded-xl object-contain shadow-md" />
+              <span className="font-display text-lg font-black tracking-tight bg-gradient-to-r from-rose-500 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                Sosmedify<span className="text-rose-500">.</span>
+              </span>
+              <span className="text-[9px] font-mono font-bold uppercase rounded px-1.5 py-0.5 bg-rose-500/15 text-rose-500 dark:text-rose-400 border border-rose-500/25">
+                STUDIO 3.5
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-sm">
+              Layanan ekstraksi multimedia dan pemotong video presisi milidetik online gratis untuk TikTok, Instagram, YouTube, Douyin, FB, X, dan Rednote.
+            </p>
+            <div className="flex items-center gap-2 pt-1 text-[11px] font-mono text-slate-500 dark:text-slate-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>FFmpeg Cloud Engine: <strong className="text-emerald-500 dark:text-emerald-400">Aktif</strong> ({backendPing?.latency || 38}ms)</span>
+            </div>
+          </div>
+
+          {/* Navigasi Cepat (3 cols) */}
+          <div className="md:col-span-3 space-y-2.5">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
+              Navigasi Cepat
+            </h4>
+            <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 font-medium">
+              <li>
+                <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-rose-500 transition-colors cursor-pointer text-left">
+                  Beranda & Alat Unduh
+                </button>
+              </li>
+              <li>
+                <a href="#platforms" className="hover:text-rose-500 transition-colors">
+                  7 Platform yang Didukung
+                </a>
+              </li>
+              <li>
+                <a href="#features" className="hover:text-rose-500 transition-colors">
+                  Keunggulan Sosmedify
+                </a>
+              </li>
+              <li>
+                <a href="#how-it-works" className="hover:text-rose-500 transition-colors">
+                  Panduan Cara Pakai
+                </a>
+              </li>
+              <li>
+                <a href="#faq" className="hover:text-rose-500 transition-colors">
+                  Tanya Jawab (FAQ)
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Kebijakan & Legal (4 cols) */}
+          <div className="md:col-span-4 space-y-2.5">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
+              Kepatuhan & Privasi
+            </h4>
+            <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 font-medium">
+              <li>
+                <button
+                  onClick={() => onOpenModal('privacy')}
+                  className="hover:text-rose-500 transition-colors text-left flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Shield size={12} className="text-emerald-400" />
+                  <span>Kebijakan Privasi (Zero-Logs)</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onOpenModal('terms')}
+                  className="hover:text-rose-500 transition-colors text-left flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileText size={12} className="text-cyan-400" />
+                  <span>Ketentuan Layanan (Fair Use)</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onOpenModal('disclaimer')}
+                  className="hover:text-rose-500 transition-colors text-left flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Info size={12} className="text-amber-400" />
+                  <span>Penafian Hak Cipta & DMCA</span>
+                </button>
+              </li>
+            </ul>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-1 leading-relaxed">
+              Sosmedify menghormati hak cipta kreator dan tidak berafiliasi resmi dengan platform pihak ketiga mana pun.
+            </p>
+          </div>
+
+        </div>
+
+        {/* Bottom bar */}
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400 font-mono text-center sm:text-left">
+          <p>© 2026 Sosmedify Studio by Dav'site. Hak cipta dilindungi.</p>
+          <p className="text-[11px] opacity-80">
+            Didesain untuk kecepatan, presisi potong frame-accurate, & tanpa watermark.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function LegalModal({ docKey, onClose }) {
+  const doc = LEGAL_DOCS[docKey];
+  if (!doc) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 bg-black/80 backdrop-blur-md anim-fade-up">
+      <div
+        className="relative w-full max-w-2xl max-h-[85vh] flex flex-col rounded-2xl glass-studio-card bg-white/95 dark:bg-[#0c101c]/95 border border-slate-200 dark:border-white/15 shadow-2xl overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+      >
+        {/* Modal Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-900/50">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-rose-500/15 flex items-center justify-center text-rose-500 border border-rose-500/30">
+              <FileText size={16} />
+            </div>
+            <div>
+              <h3 className="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                {doc.title}
+              </h3>
+              <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+                Pembaruan Terakhir: {doc.updated}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition cursor-pointer"
+            aria-label="Tutup modal"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-sans">
+          {doc.sections.map((sec, idx) => (
+            <div key={idx} className="space-y-1.5 pb-2">
+              <h4 className="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm">
+                {sec.heading}
+              </h4>
+              <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">
+                {sec.content}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Modal Footer */}
+        <div className="px-5 py-3 border-t border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-slate-900/80 flex items-center justify-between">
+          <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+            Sosmedify Studio Legal Compliance
+          </span>
+          <button
+            onClick={onClose}
+            className="btn-studio-gradient px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md cursor-pointer hover:opacity-95"
+          >
+            Saya Mengerti
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 

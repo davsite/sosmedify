@@ -1,3 +1,6 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap Google Search Console
+Sitemap: https://convertallsosmed.vercel.app/sitemap.xml
