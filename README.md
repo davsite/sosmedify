@@ -12,8 +12,8 @@
   </p>
 
   <p align="center">
-    <a href="https://convertallsosmed.vercel.app" target="_blank">
-      <img src="https://img.shields.io/badge/Live_Website-convertallsosmed.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Website" />
+    <a href="https://sosmedify.vercel.app" target="_blank">
+      <img src="https://img.shields.io/badge/Live_Website-sosmedify.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Website" />
     </a>
     <a href="https://github.com/davsite/sosmedify/releases/latest">
       <img src="https://img.shields.io/badge/Download_APK-v1.0.0-06B6D4?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
@@ -78,7 +78,7 @@
 3. **Frame-Accurate Cutting**: Memungkinkan pengguna memotong video pada milidetik tertentu menggunakan FFmpeg dengan waktu proses rata-rata `< 1.2 detik` melalui teknik stream proxy.
 4. **Client-Agnostic Ecosystem**: Menyediakan antarmuka **Web React 19** berkinerja tinggi dan **Aplikasi Android Native** dengan sinkronisasi langsung (*Live Web Sync*) tanpa perlu instal ulang saat website diperbarui.
 
-> 🌐 **Akses Publik Langsung**: [**https://convertallsosmed.vercel.app**](https://convertallsosmed.vercel.app)
+> 🌐 **Akses Publik Langsung**: [**https://sosmedify.vercel.app**](https://sosmedify.vercel.app)
 
 ---
 
@@ -299,7 +299,7 @@ Frontend React 19 dikonfigurasi untuk deployment instan di jaringan global Verce
    ```env
    VITE_API_URL=https://convertallsosmed-production.up.railway.app
    ```
-4. Klik **Deploy**. Webapp Anda langsung aktif di: [**https://convertallsosmed.vercel.app**](https://convertallsosmed.vercel.app).
+4. Klik **Deploy**. Webapp Anda langsung aktif di: [**https://sosmedify.vercel.app**](https://sosmedify.vercel.app).
 
 ---
 

@@ -8,7 +8,7 @@
       (assets/web/index.html) menggunakan WebViewAssetLoader untuk performa instan tanpa latensi web.
     -->
     <string name="web_url">https://appassets.androidplatform.net/assets/web/index.html</string>
-    <string name="remote_fallback_url">https://convertallsosmed.vercel.app</string>
+    <string name="remote_fallback_url">https://sosmedify.vercel.app</string>
     
     <string name="error_offline_title">Koneksi Terputus</string>
     <string name="error_offline_desc">Pastikan ponsel Anda terhubung ke internet untuk mengambil dan mengunduh media.</string>

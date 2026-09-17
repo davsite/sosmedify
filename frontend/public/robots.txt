@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap Google Search Console
-Sitemap: https://convertallsosmed.vercel.app/sitemap.xml
+Sitemap: https://sosmedify.vercel.app/sitemap.xml
