@@ -332,9 +332,17 @@ def process_and_download_sync(req: ProcessRequest):
 
         safe_remove(raw_path)
 
+        download_filename = f"Sosmedify_{int(time.time())}.{ext}"
+        is_youtube = any(s in target_url.lower() for s in ("youtube.com", "youtu.be"))
+        if is_youtube and info.get("title"):
+            clean_title = re.sub(r'[\\/*?:"<>|]', "", str(info["title"])).strip()
+            clean_title = re.sub(r'\s+', ' ', clean_title)[:120].strip()
+            if clean_title:
+                download_filename = f"{clean_title}.{ext}"
+
         return FileResponse(
             path=final_path,
-            filename=f"Sosmedify_{int(time.time())}.{ext}",
+            filename=download_filename,
             media_type="video/mp4" if ext == "mp4" else "audio/mpeg",
             background=BackgroundTask(safe_remove, final_path)
         )

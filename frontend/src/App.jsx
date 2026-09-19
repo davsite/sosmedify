@@ -608,7 +608,28 @@ export default function App() {
       const href = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = href;
-      a.download = `Sosmedify_${fmt(start).replace(':', '-')}_${fmt(end).replace(':', '-')}.${format}`;
+
+      const isYouTube = active?.key === 'youtube' || /youtube\.com|youtu\.be/.test(url) || /youtube\.com|youtu\.be/.test(video.canonicalUrl || '');
+      let downloadFilename;
+      if (isYouTube && video.title && video.title !== 'Video Media') {
+        const safeTitle = video.title
+          .replace(/[\\/:*?"<>|]/g, '')
+          .replace(/[\r\n\t]+/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 150);
+
+        const isTrimmed = start > 0.05 || (video.duration && end < video.duration - 0.5);
+        if (isTrimmed) {
+          downloadFilename = `${safeTitle || 'YouTube_Video'}_${fmt(start).replace(':', '-')}_${fmt(end).replace(':', '-')}.${format}`;
+        } else {
+          downloadFilename = `${safeTitle || 'YouTube_Video'}.${format}`;
+        }
+      } else {
+        downloadFilename = `Sosmedify_${fmt(start).replace(':', '-')}_${fmt(end).replace(':', '-')}.${format}`;
+      }
+
+      a.download = downloadFilename;
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(href);
       setState('preview'); setProg(null);
