@@ -1,156 +1,174 @@
 <div align="center">
 
-  <img src="docs/banner.jpg" alt="Sosmedify Studio UI Showcase Banner" width="100%" style="border-radius: 18px; box-shadow: 0 16px 40px rgba(0,0,0,0.3);" />
+  <img src="docs/banner.jpg" alt="Sosmedify Studio UI Showcase Banner" width="100%" style="border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.1);" />
 
   <br/><br/>
 
-  # 🌿「 ソスメディファイ 」・ 𝐒 𝐎 𝐒 𝐌 𝐄 𝐃 𝐈 𝐅 𝐘
-  ### Production-Grade Universal Social Media Extractor & Frame-Accurate Video/Audio Trimmer
-
+  # ⚡ 𝐒 𝐎 𝐒 𝐌 𝐄 𝐃 𝐈 𝐅 𝐘
+  ### 「 ソスメディファイ 」· Next-Gen Universal Media Ingestion & Video Studio
+  
   <p align="center">
-    <em>Universal media ingestion engine with intelligent multi-tier anti-bot bypass, frame-accurate FFmpeg stream proxy, and responsive Web & Standalone Bundled Android APK client.</em>
+    <b>Enterprise-grade social media extraction engine, frame-accurate FFmpeg trimmer, and dual-client ecosystem (Vite React 19 + Standalone Android APK).</b>
   </p>
 
   <p align="center">
     <a href="https://sosmedify.vercel.app" target="_blank">
-      <img src="https://img.shields.io/badge/Live_Website-sosmedify.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Website" />
+      <img src="https://img.shields.io/badge/🌐_Live_Demo-sosmedify.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" />
     </a>
     <a href="https://github.com/davsite/sosmedify/releases/latest">
-      <img src="https://img.shields.io/badge/Download_APK-v1.0.0-06B6D4?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
+      <img src="https://img.shields.io/badge/📱_Download_APK-v1.0.0-06B6D4?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
     </a>
-    <a href="https://github.com/davsite/sosmedify/actions/workflows/build-apk.yml">
-      <img src="https://img.shields.io/github/actions/workflow/status/davsite/sosmedify/build-apk.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI%2FCD%20Build" alt="CI/CD Status" />
+    <a href="https://github.com/davsite/sosmedify/actions">
+      <img src="https://img.shields.io/badge/⚡_CI%2FCD-Automated_Build-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI/CD Status" />
+    </a>
+    <a href="#-lisensi--kontribusi">
+      <img src="https://img.shields.io/badge/📄_License-MIT-8B5CF6?style=for-the-badge" alt="License MIT" />
     </a>
   </p>
 
+  <!-- Tech Stack Shields -->
   <p align="center">
-    <img src="https://img.shields.io/badge/FastAPI-0.115-059669?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
+    <img src="https://img.shields.io/badge/FastAPI-0.115+-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
     <img src="https://img.shields.io/badge/Python-3.12%20%7C%203.14-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
     <img src="https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React 19" />
     <img src="https://img.shields.io/badge/Vite-6.4-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite" />
-    <img src="https://img.shields.io/badge/FFmpeg-7.x%20Proxy-10B981?style=flat-square&logo=ffmpeg&logoColor=white" alt="FFmpeg" />
-    <img src="https://img.shields.io/badge/yt--dlp-Active%20Engine-F59E0B?style=flat-square&logo=youtube&logoColor=white" alt="yt-dlp" />
-    <img src="https://img.shields.io/badge/Docker-Containerized-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" />
-    <img src="https://img.shields.io/badge/License-MIT-8B5CF6?style=flat-square" alt="License" />
+    <img src="https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+    <img src="https://img.shields.io/badge/FFmpeg-7.x%20Proxy-007808?style=flat-square&logo=ffmpeg&logoColor=white" alt="FFmpeg" />
+    <img src="https://img.shields.io/badge/yt--dlp-Active%20Engine-FF0000?style=flat-square&logo=youtube&logoColor=white" alt="yt-dlp" />
+    <img src="https://img.shields.io/badge/Docker-Multi--stage-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" />
+    <img src="https://img.shields.io/badge/Railway-Production-0B0D0E?style=flat-square&logo=railway&logoColor=white" alt="Railway" />
   </p>
 
+  <!-- Quick Nav -->
   <p align="center">
-    <a href="#-ringkasan-arsitektur--architecture-overview">Arsitektur</a> •
-    <a href="#-matriks-dukungan-7-platform--platform-matrix">Platform Matrix</a> •
-    <a href="#-rest-api-documentation">REST API</a> •
-    <a href="#-aplikasi-android-apk--mobile-client">Android APK</a> •
+    <a href="#-keunggulan-arsitektur">Keunggulan</a> •
+    <a href="#-sistem-arsitektur">Arsitektur</a> •
+    <a href="#-matriks-dukungan-7-platform">Platform Matrix</a> •
+    <a href="#-rest-api-reference">REST API</a> •
+    <a href="#-aplikasi-android-apk">Android APK</a> •
     <a href="#-panduan-deployment-production">Deployment</a> •
-    <a href="#-konfigurasi-environment-variables">Environment</a> •
     <a href="#-panduan-lokal-development">Local Dev</a>
   </p>
 
-  <hr style="border: 0; height: 1px; background: linear-gradient(to right, transparent, #10B981, #06B6D4, #EC4899, transparent); margin: 24px 0;" />
+  <hr style="border: 0; height: 1px; background: linear-gradient(to right, transparent, #F43F5E, #8B5CF6, #06B6D4, transparent); margin: 28px 0;" />
 
 </div>
 
 ---
 
-## 📑 Daftar Isi
-- [🌟 Ringkasan Eksekutif](#-ringkasan-eksekutif)
-- [🏗️ Ringkasan Arsitektur & Request Lifecycle](#-ringkasan-arsitektur--architecture-overview)
-- [⛩️ Matriks Dukungan 7 Platform](#-matriks-dukungan-7-platform--platform-matrix)
-- [📡 REST API Documentation & Contract](#-rest-api-documentation)
-  - [`POST /api/info`](#1-post-apiinfo---ekstraksi-metadata--stream-url)
-  - [`GET /api/stream`](#2-get-apistream---universal-streaming-video-proxy-http-206)
-  - [`POST /api/process`](#3-post-apiprocess---pemotongan-klip--konversi-format)
-  - [`GET /api/health`](#4-get-apihealth---healthcheck-endpoint)
-- [📱 Aplikasi Mobile Android (Live Web Sync)](#-aplikasi-android-apk--mobile-client)
-- [🏮 Panduan Deployment Production](#-panduan-deployment-production)
-  - [Tahap 1: Backend ke Railway (Docker Container)](#tahap-1-deploy-backend-ke-railway-docker)
-  - [Tahap 2: Frontend ke Vercel (Edge CDN)](#tahap-2-deploy-frontend-ke-vercel)
-- [⚙️ Konfigurasi Environment Variables](#-konfigurasi-environment-variables)
-- [💻 Panduan Lokal Development](#-panduan-lokal-development)
-- [🔒 Keamanan & Manajemen Sumber Daya Memori](#-keamanan--manajemen-sumber-daya)
-- [📄 Lisensi & Kontribusi](#-lisensi--kontribusi)
+## 🌟 Keunggulan Arsitektur • Key Capabilities
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🚀 Zero-Watermark Extraction</h3>
+      <p>Mengambil berkas video mentah beresolusi penuh tanpa watermark dari <b>TikTok</b> dan <b>Douyin</b> menggunakan jalur API Aweme RPC & TikWM Gateway berkecepatan tinggi.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>🛡️ Cloud Datacenter Anti-Bot Bypass</h3>
+      <p>Menerapkan strategi fallback klien multi-tier <code>android_vr</code> & <code>ios</code> pada <b>YouTube</b> untuk menembus proteksi <i>"Sign in to confirm you're not a bot"</i> di server cloud Railway/Docker.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>⏱️ Frame-Accurate Precision Trimming</h3>
+      <p>Pemotong klip instan dengan akurasi milidetik berbasis <b>FFmpeg 7.x stream proxy</b>. Proses pemotongan rata-rata selesai dalam waktu <code>< 1.2 detik</code> tanpa membebani memori server.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>⚡ RedNote Direct CDN Ingestion (0.3s)</h3>
+      <p>Mengekstrak video dari <b>Xiaohongshu (RedNote)</b> secara langsung melalui parser SSR Desktop State & token CDN <code>sns-video</code> tanpa perlu menjalankan browser headless yang lambat.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🎵 Lossless Audio & Format Selector</h3>
+      <p>Konversi langsung ke format <b>MP4 Video</b> (hingga 1080p Full HD) atau ekstraksi <b>MP3 Audio 320kbps High-Bitrate</b> dengan penyesuaian sampling rate otomatis.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>📱 Dual Client Ecosystem</h3>
+      <p>Tersedia dalam dua antarmuka terpadu: <b>Web Application</b> modern berbasis React 19 + Vite 6 dan <b>Aplikasi Android Standalone</b> dengan aset tertanam lokal <i>(0s initial load)</i>.</p>
+    </td>
+  </tr>
+</table>
 
 ---
 
-## 🌟 Ringkasan Eksekutif
+## 🏗️ Sistem Arsitektur • System Architecture
 
-**Sosmedify** adalah sistem pengunduh, pemotong (*trimmer*), dan transkoder multimedia berskala produksi (*enterprise-grade*) yang dirancang untuk mengatasi tantangan umum dalam ekstraksi media modern:
-1. **Pencegahan Watermark Agresif**: Menghasilkan video murni (*no-watermark*) dari platform short-form seperti TikTok dan Douyin.
-2. **Bypass Anti-Bot Cloud Datacenter**: Menggunakan emulasi klien multi-tier (seperti klien `android_vr` dan `ios`) untuk mengekstrak konten YouTube tanpa terblokir oleh mekanisme anti-scraping Google.
-3. **Frame-Accurate Cutting**: Memungkinkan pengguna memotong video pada milidetik tertentu menggunakan FFmpeg dengan waktu proses rata-rata `< 1.2 detik` melalui teknik stream proxy.
-4. **Client-Agnostic Ecosystem**: Menyediakan antarmuka **Web React 19** berkinerja tinggi dan **Aplikasi Android Native** dengan sinkronisasi langsung (*Live Web Sync*) tanpa perlu instal ulang saat website diperbarui.
+Sosmedify menggunakan pola arsitektur *decoupled microservice* yang mengisolasi antarmuka klien, gateway streaming berkinerja tinggi, dan orkestrasi pemrosesan FFmpeg:
 
-> 🌐 **Akses Publik Langsung**: [**https://sosmedify.vercel.app**](https://sosmedify.vercel.app)
+```mermaid
+flowchart TD
+    subgraph Clients["🌐 CLIENT PRESENTATION LAYER"]
+        WEB["💻 Web SPA (React 19 + Vite 6 + Tailwind CSS)"]
+        APK["📱 Android Client (Standalone Embedded WebView + Native DownloadManager)"]
+    end
 
----
+    subgraph Gateway["⚡ REVERSE PROXY & FASTAPI GATEWAY (Railway)"]
+        ROUTER{"API Gateway Router"}
+        INFO["/api/info<br/>Canonical URL Extractor"]
+        STREAM["/api/stream<br/>HTTP 206 Partial Chunk Proxy"]
+        PROCESS["/api/process<br/>FFmpeg Frame-Accurate Engine"]
+        HEALTH["/api/health<br/>Liveness & Readiness Probe"]
+    end
 
-## 🏗️ Ringkasan Arsitektur • Architecture Overview
+    subgraph Engines["🧩 MULTI-TIER SCRAPER & EXTRACTOR MATRIX"]
+        YOUTUBE["YouTube Engine<br/>• Primary: android_vr Client<br/>• Fallback: tv / ios Clients<br/>• Optional: Session Cookie"]
+        TIKTOK["TikTok & Douyin<br/>• TikWM Gateway<br/>• Canonical Aweme RPC<br/>• No-Watermark CDN Resolver"]
+        REDNOTE["RedNote / Xiaohongshu<br/>• Desktop SSR State Parser<br/>• Direct sns-video CDN Tokenizer"]
+        META["Instagram & Facebook<br/>• Graph API Scraper<br/>• Public Reel Stream Extractor"]
+        TWITTER["X / Twitter<br/>• Video Bearer Stream Decoupler"]
+    end
 
-Sistem Sosmedify dibangun dengan arsitektur decoupled berorientasi microservices:
+    subgraph Storage["💾 EPHEMERAL STORAGE & BUFFER"]
+        TEMP["/app/temp_media<br/>• Ephemeral Local Buffer<br/>• Auto-purged via Starlette BackgroundTask"]
+        S3["Cloudflare R2 / AWS S3<br/>(Optional Persistent Storage)"]
+    end
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                             CLIENT PRESENTATION                             │
-│                                                                             │
-│   🌐 Web Application (React 19 + Vite 6 + Tailwind CSS)                     │
-│   📱 Android Native Client (Custom WebView + Native DownloadManager)         │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │ HTTP / REST & Range 206
-                                       ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                       GATEWAY & PROCESSING LAYER (FastAPI)                  │
-│                                                                             │
-│  ┌───────────────────────┐  ┌──────────────────────┐  ┌──────────────────┐  │
-│  │   /api/info           │  │   /api/stream        │  │   /api/process   │  │
-│  │   URL Canonicalizer   │  │   Range Chunk Proxy  │  │   FFmpeg Trimmer │  │
-│  └───────────┬───────────┘  └──────────┬───────────┘  └────────┬─────────┘  │
-│              │                         │                       │            │
-│              ▼                         ▼                       ▼            │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                    MULTI-TIER EXTRACTOR ENGINE                        │  │
-│  │  • TikTok / Douyin (TikWM API / AWEME RPC / Canonical URL Resolve)    │  │
-│  │  • Instagram & Facebook (Graph Stream / CDN Decoupler)                │  │
-│  │  • X / Twitter (Direct HLS/MP4 Token Parser)                          │  │
-│  │  • RedNote / Xiaohongshu (Desktop SSR Direct CDN Tokenizer, 0.3s)     │  │
-│  │  • YouTube (Anti-Bot `android_vr` & `ios` Datacenter IP Bypass)       │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │ Ephemeral Storage / CDN Delivery
-                                       ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                            PERSISTENCE & STORAGE                            │
-│                                                                             │
-│  • Ephemeral Cache: /app/temp_media (Auto-purged via Starlette Background)  │
-│  • (Optional) Object Storage: Cloudflare R2 / AWS S3 via boto3              │
-└─────────────────────────────────────────────────────────────────────────────┘
+    WEB -->|REST / JSON| ROUTER
+    APK -->|REST / JSON| ROUTER
+    ROUTER --> INFO
+    ROUTER --> STREAM
+    ROUTER --> PROCESS
+    ROUTER --> HEALTH
+
+    INFO --> Engines
+    STREAM -->|Range Requests| Engines
+    PROCESS -->|Direct Pipe| TEMP
+    TEMP -.-> S3
 ```
 
 ---
 
 ## ⛩️ Matriks Dukungan 7 Platform • Platform Matrix
 
-| Platform | Pola URL (Regex Support) | Engine Ekstraksi | Bypass Mekanisme | Resolusi Maks. | Watermark | Audio Output |
+| Platform | Pola URL (Regex Support) | Engine Ekstraksi | Mekanisme Bypass | Output Resolusi | Watermark | Audio Output |
 | :--- | :--- | :--- | :--- | :---: | :---: | :---: |
-| **TikTok** | `tiktok.com`, `vm.tiktok.com`, `vt.tiktok.com` | TikWM Gateway + Fallback yt-dlp | Mobile UA Spoofing & Redirect Resolve | 1080p | ❌ Bersih | MP3 320k |
-| **Douyin** | `douyin.com`, `v.douyin.com`, `iesdouyin.com` | TikWM Aweme RPC & Canonical Extractor | Mobile Cookie Session Emulation | 1080p | ❌ Bersih | MP3 320k |
-| **Instagram** | `instagram.com/(reel\|p\|tv)/` | Graph Video Scraper + Session Fallback | Multi-Cookie Rotator | 1080p | ❌ Bersih | MP3 320k |
+| **TikTok** | `tiktok.com`, `vm.tiktok.com`, `vt.tiktok.com` | TikWM Gateway + yt-dlp | Mobile UA Spoofing & Redirect Resolver | 1080p | ❌ Bersih | MP3 320k |
+| **Douyin** | `douyin.com`, `v.douyin.com`, `iesdouyin.com` | TikWM Aweme RPC & Canonical Page | Mobile Session Emulation | 1080p | ❌ Bersih | MP3 320k |
+| **Instagram** | `instagram.com/(reel\|p\|tv)/` | Graph Video Stream Decoupler | Multi-Cookie Session Rotator | 1080p | ❌ Bersih | MP3 320k |
 | **Facebook** | `facebook.com`, `fb.watch`, `fb.com` | Direct Watch & Public Reels Parser | Desktop SSR Tokenizer | 1080p | ❌ Bersih | MP3 320k |
-| **X / Twitter** | `x.com`, `twitter.com` | Twitter Video CDN Stream Decoupler | Direct Bearer Proxy | 1080p | ❌ Bersih | MP3 320k |
-| **RedNote** | `xiaohongshu.com`, `xhslink.com` | Desktop SSR & Direct CDN Tokenizer | 0.3s Direct Stream Decoupler | 1080p | ❌ Bersih | MP3 320k |
-| **YouTube** | `youtube.com/watch`, `youtu.be`, `youtube.com/shorts` | Multi-Client yt-dlp Engine | Anti-Bot `android_vr` Client Bypass | 4K / 1080p | ❌ Bersih | MP3 320k |
+| **X / Twitter** | `x.com`, `twitter.com` | Video CDN Token Parser | Direct Stream Decoupler | 1080p | ❌ Bersih | MP3 320k |
+| **RedNote** | `xiaohongshu.com`, `xhslink.com` | Desktop SSR & Direct CDN Extractor | 0.3s Fast Stream Tokenizer | 1080p | ❌ Bersih | MP3 320k |
+| **YouTube** | `youtube.com/watch`, `youtu.be`, `shorts` | yt-dlp Innertube Engine | Anti-Bot `android_vr` Client Bypass | 4K / 1080p | ❌ Bersih | MP3 320k |
 
 ---
 
-## 📡 REST API Documentation
+## 📡 REST API Reference
 
-Semua endpoint API disajikan dengan format JSON standar dan dilengkapi CORS universal untuk integrasi web dan aplikasi mobile.
+Semua respons API menggunakan standar JSON terstruktur dan mendukung CORS universal.
 
-### 1. `POST /api/info` — Ekstraksi Metadata & Stream URL
-Mengurai URL media sosial apa pun menjadi metadata terstruktur dan URL stream langsung untuk preview.
+<details open>
+<summary><b>1. POST /api/info — Ekstraksi Metadata & Stream URL</b></summary>
+<br/>
+
+Menganalisis link media sosial, mengurai link pendek (*shortlinks*), dan mengembalikan metadata lengkap beserta daftar resolusi video yang tersedia.
 
 * **Endpoint**: `/api/info`
 * **Method**: `POST`
-* **Headers**: `Content-Type: application/json`
+* **Header**: `Content-Type: application/json`
 
-**Request Body:**
+**Request Payload:**
 ```json
 {
   "url": "https://vt.tiktok.com/ZSjXexample/"
@@ -162,8 +180,8 @@ Mengurai URL media sosial apa pun menjadi metadata terstruktur dan URL stream la
 {
   "status": "success",
   "data": {
-    "title": "Sosmedify Sample Video Title",
-    "duration": 45.2,
+    "title": "Sosmedify Video Showcase",
+    "duration": 48.5,
     "thumbnail": "https://p16-sign.tiktokcdn.com/...jpg",
     "direct_url": "https://v16-webapp-prime.tiktokcdn.com/...mp4",
     "qualities": [
@@ -176,69 +194,71 @@ Mengurai URL media sosial apa pun menjadi metadata terstruktur dan URL stream la
   }
 }
 ```
+</details>
 
----
+<details>
+<summary><b>2. GET /api/stream — Universal Streaming Video Proxy (HTTP 206)</b></summary>
+<br/>
 
-### 2. `GET /api/stream` — Universal Streaming Video Proxy (HTTP 206)
-Menyediakan tunneling CORS dan mendukung *HTTP 206 Partial Content* dengan range requests untuk pemutaran video instan tanpa perlu mengunduh seluruh file terlebih dahulu.
+Menyediakan tunneling CORS dan mendukung *HTTP 206 Partial Content* dengan range requests. Fitur ini memungkinkan pengguna melihat preview video secara instan di filmstrip sebelum memotong video tanpa harus menunggu seluruh video terunduh.
 
 * **Endpoint**: `/api/stream`
 * **Method**: `GET`
-* **Query Parameters**:
-  - `url`: *(string, URL-encoded)* URL stream langsung dari hasil `/api/info`.
-* **Headers Didukung**: `Range: bytes=0-1048576`
+* **Query Params**: `url=<encoded_direct_url>`
+* **Header**: `Range: bytes=0-1048576`
 
 **Contoh cURL:**
 ```bash
 curl -I -X GET "https://convertallsosmed-production.up.railway.app/api/stream?url=https%3A%2F%2Fcdn.example.com%2Fvideo.mp4" \
-  -H "Range: bytes=0-1000"
+  -H "Range: bytes=0-1048576"
 ```
+</details>
 
----
+<details>
+<summary><b>3. POST /api/process — Pemotongan Klip & Konversi Format</b></summary>
+<br/>
 
-### 3. `POST /api/process` — Pemotongan Klip & Konversi Format
-Melakukan proses pemotongan klip (*frame-accurate trim*) dan konversi ke MP4 atau MP3 (320kbps).
+Menjalankan subproses pemotongan presisi (*frame-accurate trim*) dan konversi format ke MP4 Video atau MP3 Audio (320kbps) dengan encoding hardware/fast-preset.
 
 * **Endpoint**: `/api/process`
 * **Method**: `POST`
-* **Headers**: `Content-Type: application/json`
+* **Header**: `Content-Type: application/json`
 
-**Request Body:**
+**Request Payload:**
 ```json
 {
   "url": "https://www.instagram.com/reel/CxExample/",
   "start_time": 5.0,
-  "end_time": 15.5,
+  "end_time": 18.5,
   "format": "mp4",
   "resolution": "1080"
 }
 ```
 
-**Response (Direct Stream File atau JSON):**
-File biner video/audio akan dialirkan langsung dengan header `Content-Disposition: attachment; filename="Sosmedify_...mp4"`.
+**Response**: Berkas biner media langsung terunduh via streaming attachment dengan nama berkas `Sosmedify_00-05_00-18.mp4`.
+</details>
 
----
+<details>
+<summary><b>4. GET /api/health — Liveness & Readiness Probe</b></summary>
+<br/>
 
-### 4. `GET /api/health` — Healthcheck Endpoint
-Digunakan oleh monitor infrastruktur (seperti Railway, Kubernetes, atau UptimeRobot).
+Digunakan oleh monitor infrastruktur (Railway, Docker health check, atau Uptime monitoring).
 
-* **Endpoint**: `/api/health`
-* **Response (200 OK):**
 ```json
 {
   "status": "HEALTHY",
   "app_name": "Sosmedify Converter Service",
   "redis_broker": "CONNECTED",
-  "s3_storage_configured": false,
-  "bucket_name": "media-converter-bucket"
+  "s3_storage_configured": false
 }
 ```
+</details>
 
 ---
 
 ## 📱 Aplikasi Android (APK) • Mobile Client
 
-Sosmedify dilengkapi dengan proyek aplikasi native di dalam folder [`android-app/`](file:///c:/Users/user/OneDrive/Dokumen/ALL%20sosmed%20by%20dav'site/android-app) berbasis **Standalone Embedded Architecture** (Aset antarmuka React 19 tertanam 100% di dalam file APK).
+Sosmedify dilengkapi aplikasi native Android dalam folder [`android-app/`](android-app/) dengan arsitektur **Standalone Embedded Client**:
 
 ```
 📱 Perangkat Android Pengguna
@@ -255,135 +275,119 @@ Sosmedify dilengkapi dengan proyek aplikasi native di dalam folder [`android-app
                                               └── yt-dlp & FFmpeg 7.x
 ```
 
-### 📥 Unduh Berkas APK Siap Pasang
+### 📥 Unduh Berkas APK Siap Pakai
 
-| Nama Berkas | Versi | Ukuran | Link Unduhan Langsung | Keamanan |
+| Berkas | Versi | Ukuran | Status Keamanan | Unduhan |
 | :--- | :---: | :---: | :---: | :---: |
-| **`sosmedify-v1.0.0.apk`** | `v1.0.0` | **~7 MB** | [**⬇️ Unduh APK Langsung**](https://github.com/davsite/sosmedify/releases/download/v1.0.0/sosmedify-v1.0.0.apk) | ![Verified](https://img.shields.io/badge/Security-Verified-10B981?style=flat-square) |
-| **Halaman Semua Rilis** | `Semua` | - | [**🌐 Kunjungi GitHub Releases**](https://github.com/davsite/sosmedify/releases) | ![Releases](https://img.shields.io/badge/GitHub-Releases-blue?style=flat-square) |
-| **Build Artifacts CI/CD** | `Debug` | **~7 MB** | [**📦 Unduh via GitHub Actions**](https://github.com/davsite/sosmedify/actions) | ![CI](https://img.shields.io/badge/Workflow-Pass-06B6D4?style=flat-square) |
+| **`sosmedify-v1.0.0.apk`** | `v1.0.0` | **~7 MB** | ![Verified](https://img.shields.io/badge/Security-Verified-10B981?style=flat-square) | [**⬇️ Unduh APK Langsung**](https://github.com/davsite/sosmedify/releases/download/v1.0.0/sosmedify-v1.0.0.apk) |
+| **GitHub Releases** | `Semua` | - | ![GitHub](https://img.shields.io/badge/Official-Release-06B6D4?style=flat-square) | [**🌐 Kunjungi Releases**](https://github.com/davsite/sosmedify/releases) |
 
 > [!TIP]
-> **Keunggulan Standalone Embedded Architecture**:
-> Aplikasi Android tidak lagi memuat web live online secara lambat, melainkan membuka seluruh antarmuka dan animasi secara instan dari penyimpanan internal ponsel melalui `WebViewAssetLoader`. Komunikasi scraping dan konversi video FFmpeg tetap dikerjakan dengan cepat oleh cloud server di latar belakang!
+> **Keunggulan Aset Tertanam (*Offline-Ready UI*)**:
+> Seluruh antarmuka React 19 tersimpan langsung di dalam berkas APK. Saat dibuka, aplikasi langsung muncul tanpa menunggu koneksi internet memuat aset web. Komunikasi scraping dan konversi media tetap berjalan cepat melalui backend cloud Railway.
 
 ---
 
 ## 🏮 Panduan Deployment Production
 
-### Tahap 1: Deploy Backend ke Railway (Docker)
-
-Backend dikemas dalam container mandiri lengkap dengan runtime Python 3.12, FFmpeg binary, dan pustaka yt-dlp.
-
-1. Buat akun di [Railway.app](https://railway.app).
-2. Klik **New Project** → **Deploy from GitHub repo** → pilih repository `sosmedify`.
-3. Railway akan membaca [`Dockerfile`](file:///c:/Users/user/OneDrive/Dokumen/ALL%20sosmed%20by%20dav'site/Dockerfile) & [`railway.json`](file:///c:/Users/user/OneDrive/Dokumen/ALL%20sosmed%20by%20dav'site/railway.json):
-   - Port internal default: `8080`.
+### 1. Deploy Backend ke Railway (Docker Container)
+1. Buka [Railway.app](https://railway.app) dan hubungkan akun GitHub Anda.
+2. Klik **New Project** → **Deploy from GitHub repo** → pilih repository ini.
+3. Railway otomatis mendeteksi [`railway.json`](railway.json) dan membangun container dari [`Dockerfile`](Dockerfile):
+   - Port default: `8080`.
    - Healthcheck path: `/api/health`.
-4. Masuk ke **Settings** → **Networking** → klik **Generate Domain**.  
-   Contoh domain aktif: `https://convertallsosmed-production.up.railway.app`.
+4. Masuk ke menu **Settings** → **Networking** → klik **Generate Domain** (misal: `https://convertallsosmed-production.up.railway.app`).
 
----
-
-### Tahap 2: Deploy Frontend ke Vercel
-
-Frontend React 19 dikonfigurasi untuk deployment instan di jaringan global Vercel Edge.
-
-1. Buka [Vercel](https://vercel.com) dan impor repository `sosmedify`.
-2. Pengaturan Project:
+### 2. Deploy Frontend ke Vercel (Edge Network)
+1. Buka [Vercel](https://vercel.com) dan impor repository Anda.
+2. Konfigurasi build project:
    - **Framework Preset**: `Vite`
    - **Root Directory**: `frontend`
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
-3. Tambahkan **Environment Variable**:
+3. Masukkan **Environment Variable**:
    ```env
    VITE_API_URL=https://convertallsosmed-production.up.railway.app
    ```
-4. Klik **Deploy**. Webapp Anda langsung aktif di: [**https://sosmedify.vercel.app**](https://sosmedify.vercel.app).
+4. Klik **Deploy**. Webapp Anda langsung aktif secara global di Vercel Edge CDN!
 
 ---
 
 ## ⚙️ Konfigurasi Environment Variables
 
-Semua kredensial sensitif diisolasi ke dalam variabel lingkungan dan **tidak tersimpan di dalam repositori publik**:
-
-| Variabel | Wajib | Nilai Default | Deskripsi |
-| :--- | :---: | :---: | :--- |
-| `PORT` | Tidak | `8080` | Port listen server FastAPI. |
-| `DEBUG` | Tidak | `false` | Mengaktifkan verbose logging dan reload server. |
-| `VITE_API_URL` | Ya (Frontend) | `http://localhost:8000` | URL endpoint backend Railway (tanpa tanda slash akhir `/`). |
-| `YOUTUBE_COOKIES` | Tidak | `None` | Konten string format Netscape cookies untuk rotasi sesi YouTube. |
-| `PROXIES` | Tidak | `[]` | JSON array daftar proxy HTTP/SOCKS5 untuk rotasi IP scraper. |
-| `S3_ENDPOINT_URL` | Tidak | `None` | Endpoint URL Cloudflare R2 / AWS S3. |
-| `S3_ACCESS_KEY` | Tidak | `None` | Access Key ID untuk penyimpanan S3. |
-| `S3_SECRET_KEY` | Tidak | `None` | Secret Key ID untuk penyimpanan S3. |
-| `S3_BUCKET_NAME` | Tidak | `None` | Nama bucket S3/R2 tujuan penyimpanan permanen. |
+| Variabel | Kategori | Wajib | Nilai Default | Deskripsi |
+| :--- | :---: | :---: | :---: | :--- |
+| `PORT` | Backend | Tidak | `8080` | Port listen server FastAPI container. |
+| `DEBUG` | Backend | Tidak | `false` | Mode debug & verbose logging. |
+| `VITE_API_URL` | Frontend | **Ya** | `http://localhost:8000` | URL endpoint backend Railway (tanpa trailing slash `/`). |
+| `YOUTUBE_COOKIES` | Backend | Tidak | `None` | Konten cookies Netscape untuk rotasi sesi YouTube jika dibutuhkan. |
+| `PROXIES` | Backend | Tidak | `[]` | JSON array proxy HTTP/SOCKS5 untuk rotasi alamat IP scraper. |
+| `S3_ENDPOINT_URL` | Storage | Tidak | `None` | Endpoint URL Cloudflare R2 / AWS S3 (opsional). |
+| `S3_ACCESS_KEY` | Storage | Tidak | `None` | Access Key ID kredensial S3. |
+| `S3_SECRET_KEY` | Storage | Tidak | `None` | Secret Key kredensial S3. |
+| `S3_BUCKET_NAME` | Storage | Tidak | `None` | Nama bucket S3/R2 tujuan upload permanen. |
 
 ---
 
 ## 💻 Panduan Lokal Development
 
-### Prasyarat Sistem
-* **Python**: 3.11 atau lebih tinggi
-* **Node.js**: 18.x atau lebih tinggi (disarankan 20 LTS)
-* **FFmpeg**: 6.0+ terpasang di system PATH
+### Prasyarat
+* **Python**: 3.11 atau lebih baru
+* **Node.js**: 18.x atau lebih baru (disarankan Node 20 LTS)
+* **FFmpeg**: 6.0+ terpasang di PATH sistem
 
 ### 1. Menjalankan Backend
 ```bash
-# Masuk ke direktori backend
+# Pindah ke direktori backend
 cd backend
 
-# Buat virtual environment
+# Buat & aktifkan virtual environment
 python -m venv venv
+source venv/bin/activate   # Linux/Mac
+# .\venv\Scripts\activate  # Windows
 
-# Aktivasi virtual environment
-# Windows:
-.\venv\Scripts\activate
-# Linux/Mac:
-source venv/bin/activate
-
-# Instal dependensi
+# Instal pustaka dependensi
 pip install -r requirements.txt
 
-# Jalankan server pengembangan
+# Jalankan server FastAPI dengan auto-reload
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 Akses Swagger UI dokumentasi API di: `http://localhost:8000/docs`.
 
 ### 2. Menjalankan Frontend
 ```bash
-# Buka terminal baru dan masuk ke direktori frontend
+# Buka terminal baru dan masuk ke frontend
 cd frontend
 
-# Instal dependensi paket
+# Instal paket dependensi
 npm install
 
 # Jalankan server Vite development
 npm run dev
 ```
-Buka browser Anda di: `http://localhost:5173`.
+Buka browser di: `http://localhost:5173`.
 
 ---
 
 ## 🔒 Keamanan & Manajemen Sumber Daya
 
-- **Pembersihan Otomatis Berkas Media**: Seluruh file sementara pada `/app/temp_media` diproses menggunakan Starlette `BackgroundTask`. Berkas dihapus dari storage segera setelah pengiriman ke pengguna selesai, mencegah kebocoran disk (*zero disk leak*).
-- **Perlindungan Input URL**: Input pengguna divalidasi dan disanitasi menggunakan ekspresi reguler ketat untuk mencegah serangan injeksi perintah shell pada subproses FFmpeg.
-- **Isolasi Widget Monetisasi**: Banner iklan Adsterra dimuat dalam sandbox `iframe srcDoc` terisolasi untuk memastikan skrip iklan pihak ketiga tidak dapat mengakses state aplikasi atau token sesi pengguna.
+- **Pembersihan Berkas Otomatis**: Berkas sementara di `/app/temp_media` diproses menggunakan Starlette `BackgroundTask` dan langsung dihapus setelah pengiriman selesai ke pengguna (*zero disk leak*).
+- **Sanitasi Parameter Input**: Parameter waktu pemotongan dan resolusi divalidasi ketat menggunakan Pydantic v2 untuk mencegah *command injection* pada subproses FFmpeg.
+- **Wadah Iklan Terisolasi**: Banner monetisasi Adsterra dimuat dalam sandbox `iframe srcDoc` terisolasi sehingga tidak dapat memblokir interaksi UI atau mengakses token pengguna.
 
 ---
 
-## 📄 Lisensi & Kontribusi
+## 📄 Lisensi & Hak Cipta
 
-Proyek ini dilisensikan di bawah ketentuan [MIT License](LICENSE).  
-Kontribusi, pembukaan isu bug, dan pull request sangat disambut hangat untuk pengembangan fitur platform selanjutnya.
+Proyek ini dirilis di bawah lisensi terbuka [MIT License](LICENSE).  
+Bebas digunakan, dikembangkan, dan dimodifikasi untuk kebutuhan personal maupun komersial.
 
 <div align="center">
 
   <br/>
-  <p>🍃 <em>Dibuat dengan dedikasi tinggi, ketenangan alam, dan performa kode yang optimal.</em> 🌸</p>
+  <p>🍃 <i>Dibuat dengan presisi tinggi, dedikasi penuh, dan arsitektur yang tangguh.</i> 🌸</p>
   <p><strong>Sosmedify by Dav'site</strong> • © 2026</p>
 
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/grass.png" width="100%" alt="Nature footer line" />
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/grass.png" width="100%" alt="Footer accent line" />
 
 </div>
