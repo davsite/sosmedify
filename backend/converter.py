@@ -67,34 +67,60 @@ def download_raw_media(direct_url: str, output_path: str, headers: Optional[dict
         fallback_targets.append(direct_url)
 
         import yt_dlp
+        import random
         cookie_path = os.path.join(os.path.dirname(__file__), "cookies.txt")
+        if not os.path.exists(cookie_path):
+            root_cookie = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cookies.txt")
+            if os.path.exists(root_cookie):
+                cookie_path = root_cookie
+
         for target in fallback_targets:
-            try:
-                ydl_opts = {
-                    "quiet": True,
-                    "no_warnings": True,
-                    "nocheckcertificate": True,
-                    "outtmpl": output_path,
-                    "format": "bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best/18",
-                    "merge_output_format": "mp4",
-                    "socket_timeout": 20,
-                    "retries": 2,
-                    "extractor_args": {
-                        "youtube": {
-                            "player_client": ["android", "ios", "mweb"]
-                        }
+            for client_choice in (["mweb"], ["android"], ["web"], ["tv"], None):
+                try:
+                    ydl_opts = {
+                        "quiet": True,
+                        "no_warnings": True,
+                        "nocheckcertificate": True,
+                        "outtmpl": output_path,
+                        "format": "bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best/18",
+                        "merge_output_format": "mp4",
+                        "socket_timeout": 20,
+                        "retries": 2,
+                        "js_runtimes": {"node": {}, "deno": {}},
                     }
-                }
-                if os.path.exists(cookie_path):
-                    ydl_opts["cookiefile"] = cookie_path
-                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    ydl.download([target])
-                if os.path.exists(output_path) and os.path.getsize(output_path) > 1024:
-                    download_ok = True
-                    break
-            except Exception as ydl_err:
-                logger.warning(f"yt-dlp fallback download gagal untuk {target}: {ydl_err}")
-                safe_remove(output_path)
+                    if client_choice:
+                        ydl_opts["extractor_args"] = {
+                            "youtube": {
+                                "player_client": client_choice
+                            }
+                        }
+
+                    # Cek environment variable YOUTUBE_COOKIES
+                    cookies_env = os.environ.get("YOUTUBE_COOKIES", "").strip()
+                    if cookies_env:
+                        temp_cookie = os.path.join(os.path.dirname(__file__), "env_cookies.txt")
+                        with open(temp_cookie, "w", encoding="utf-8") as cf:
+                            cf.write(cookies_env)
+                        ydl_opts["cookiefile"] = temp_cookie
+                    elif os.path.exists(cookie_path):
+                        ydl_opts["cookiefile"] = cookie_path
+
+                    yt_proxy = os.environ.get("YOUTUBE_PROXY", "").strip()
+                    if yt_proxy:
+                        ydl_opts["proxy"] = yt_proxy
+                    elif settings.PROXIES:
+                        ydl_opts["proxy"] = random.choice(settings.PROXIES)
+
+                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                        ydl.download([target])
+                    if os.path.exists(output_path) and os.path.getsize(output_path) > 1024:
+                        download_ok = True
+                        break
+                except Exception as ydl_err:
+                    logger.warning(f"yt-dlp fallback download gagal ({client_choice}) untuk {target[:60]}: {ydl_err}")
+                    safe_remove(output_path)
+            if download_ok:
+                break
 
     if not os.path.exists(output_path) or os.path.getsize(output_path) < 1024:
         safe_remove(output_path)

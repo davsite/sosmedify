@@ -458,113 +458,95 @@ async def _scrape_with_playwright_stealth(url: str, platform: str) -> Dict[str, 
 def _extract_youtube_fallback(url: str) -> Optional[Dict[str, Any]]:
     """
     Fallback extractor untuk YouTube ketika IP datacenter (seperti Railway) terkena bot protection.
-    Memanfaatkan multi-instance Invidious API dan Cobalt API publik yang terdistribusi.
+    Memanfaatkan instance Invidious publik sehat yang dideteksi secara dinamis.
     """
     logger.info(f"[YouTube Fallback] Mencoba fallback API terdistribusi untuk: {url}")
     
-    # Ekstraksi YouTube Video ID
     yt_id_match = re.search(r"(?:v=|\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})", url)
     video_id = yt_id_match.group(1) if yt_id_match else None
     
-    # 1. Coba Invidious API instances jika video_id ditemukan
-    if video_id:
-        invidious_instances = [
-            "https://inv.nadeko.net",
-            "https://invidious.nerdvpn.de",
-            "https://yewtu.be",
-            "https://invidious.jing.rocks",
-            "https://invidious.privacyredirect.com",
-        ]
-        for inv_base in invidious_instances:
-            api_url = f"{inv_base}/api/v1/videos/{video_id}"
-            try:
-                resp = requests.get(api_url, headers={"User-Agent": DESKTOP_UA}, timeout=6)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    title = data.get("title", "YouTube Video")
-                    duration = int(data.get("lengthSeconds") or 60)
-                    thumb_list = data.get("videoThumbnails") or []
-                    thumb = thumb_list[0].get("url") if thumb_list else None
+    if not video_id:
+        return None
 
-                    # Prioritaskan format gabungan (video + audio)
-                    streams = data.get("formatStreams") or []
-                    chosen_url = None
-                    for s in streams:
-                        if s.get("url") and s.get("container") in ("mp4", "webm"):
-                            chosen_url = s["url"]
-                            break
-                    
-                    if not chosen_url and streams:
-                        chosen_url = streams[0].get("url")
-
-                    # Jika hanya ada adaptiveFormats (video-only)
-                    audio_url = None
-                    adaptive = data.get("adaptiveFormats") or []
-                    if not chosen_url and adaptive:
-                        v_cands = [f for f in adaptive if f.get("type", "").startswith("video") and f.get("url")]
-                        a_cands = [f for f in adaptive if f.get("type", "").startswith("audio") and f.get("url")]
-                        if v_cands:
-                            v_cands.sort(key=lambda x: int(x.get("resolution", "0x0").split("x")[-1] or 0))
-                            chosen_url = v_cands[-1]["url"]
-                        if a_cands:
-                            audio_url = a_cands[-1]["url"]
-
-                    if chosen_url:
-                        logger.info(f"[YouTube Fallback] Berhasil via Invidious ({inv_base})")
-                        return {
-                            "title": title,
-                            "thumbnail": thumb,
-                            "duration": duration,
-                            "direct_url": chosen_url,
-                            "audio_url": audio_url,
-                            "qualities": [
-                                {"label": "720p HD", "height": 720},
-                                {"label": "480p SD", "height": 480},
-                                {"label": "360p SD", "height": 360}
-                            ],
-                            "stream_headers": {"User-Agent": DESKTOP_UA, "Referer": "https://www.youtube.com/"}
-                        }
-            except Exception as e:
-                logger.debug(f"Invidious instance {inv_base} failed: {e}")
-                continue
-
-    # 2. Coba Cobalt API instances
-    cobalt_instances = [
-        "https://api.cobalt.tools",
-        "https://cobalt-api.kwiatekm.tokyo",
-        "https://cobalt.api.redstream.org"
+    # Dapatkan daftar instance Invidious yang sedang sehat & aktif
+    invidious_instances = [
+        "https://invidious.f5.si",
+        "https://yt.chocolatemoo53.com",
+        "https://invidious.tiekoetter.com",
+        "https://inv.nadeko.net",
+        "https://yewtu.be",
     ]
-    for c_base in cobalt_instances:
+    try:
+        health_resp = requests.get("https://api.invidious.io/instances.json?sort_by=health", timeout=3)
+        if health_resp.status_code == 200:
+            dyn_list = []
+            for item in health_resp.json():
+                if isinstance(item, list) and len(item) > 1:
+                    info_dict = item[1]
+                    if info_dict.get("type") == "https" and info_dict.get("api"):
+                        uri = info_dict.get("uri") or f"https://{item[0]}"
+                        dyn_list.append(uri.rstrip("/"))
+            if dyn_list:
+                invidious_instances = dyn_list[:6] + invidious_instances
+    except Exception as he:
+        logger.debug(f"Gagal mengambil dynamic invidious instances: {he}")
+
+    for inv_base in invidious_instances:
+        api_url = f"{inv_base}/api/v1/videos/{video_id}"
         try:
-            c_url = f"{c_base}/"
-            resp = requests.post(
-                c_url,
-                json={"url": url},
-                headers={
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "User-Agent": DESKTOP_UA
-                },
-                timeout=8
-            )
+            resp = requests.get(api_url, headers={"User-Agent": DESKTOP_UA}, timeout=6)
             if resp.status_code == 200:
-                c_data = resp.json()
-                media_url = c_data.get("url")
-                if media_url:
-                    logger.info(f"[YouTube Fallback] Berhasil via Cobalt ({c_base})")
+                data = resp.json()
+                title = data.get("title", "YouTube Video")
+                duration = int(data.get("lengthSeconds") or 60)
+                thumb_list = data.get("videoThumbnails") or []
+                thumb = thumb_list[0].get("url") if thumb_list else None
+
+                # 1. Coba format gabungan (video + audio)
+                streams = data.get("formatStreams") or []
+                chosen_url = None
+                for s in streams:
+                    if s.get("url") and s.get("container") in ("mp4", "webm"):
+                        chosen_url = s["url"]
+                        break
+                
+                if not chosen_url and streams:
+                    chosen_url = streams[0].get("url")
+
+                # 2. Coba adaptiveFormats (video + audio terpisah)
+                audio_url = None
+                adaptive = data.get("adaptiveFormats") or []
+                if not chosen_url and adaptive:
+                    v_cands = [f for f in adaptive if f.get("type", "").startswith("video") and f.get("url")]
+                    a_cands = [f for f in adaptive if f.get("type", "").startswith("audio") and f.get("url")]
+                    if v_cands:
+                        v_cands.sort(key=lambda x: int(x.get("resolution", "0x0").split("x")[-1] or 0))
+                        chosen_url = v_cands[-1]["url"]
+                    if a_cands:
+                        audio_url = a_cands[-1]["url"]
+
+                if chosen_url:
+                    logger.info(f"[YouTube Fallback] Berhasil via Invidious ({inv_base})")
                     return {
-                        "title": "YouTube Video",
-                        "thumbnail": None,
-                        "duration": 60,
-                        "direct_url": media_url,
+                        "title": title,
+                        "thumbnail": thumb,
+                        "duration": duration,
+                        "direct_url": chosen_url,
+                        "audio_url": audio_url,
                         "qualities": [
+                            {"label": "1080p Full HD", "height": 1080},
                             {"label": "720p HD", "height": 720},
-                            {"label": "480p SD", "height": 480}
+                            {"label": "480p SD", "height": 480},
+                            {"label": "360p SD", "height": 360}
                         ],
-                        "stream_headers": {"User-Agent": DESKTOP_UA}
+                        "stream_headers": {
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+                            "Accept": "*/*",
+                            "Referer": f"{inv_base}/"
+                        }
                     }
         except Exception as e:
-            logger.debug(f"Cobalt instance {c_base} failed: {e}")
+            logger.debug(f"Invidious instance {inv_base} failed: {e}")
             continue
 
     return None
@@ -581,11 +563,11 @@ def _extract_with_ytdlp(url: str, custom_headers: Optional[dict] = None) -> Dict
     is_yt = "youtube.com" in url.lower() or "youtu.be" in url.lower()
     client_strategies = (
         [
-            ["ios"],
             ["mweb"],
-            ["tv_embedded", "android_vr"],
             ["android"],
-            ["web_creator"],
+            ["web"],
+            ["ios"],
+            ["tv"],
             None
         ]
         if is_yt
@@ -610,21 +592,14 @@ def _extract_with_ytdlp(url: str, custom_headers: Optional[dict] = None) -> Dict
             "skip_download": True,
             "socket_timeout": 15,
             "retries": 3,
-            "format": "best/bestvideo+bestaudio",
             "check_formats": False,
+            "js_runtimes": {"node": {}, "deno": {}},
         }
 
         if clients:
             ydl_opts["extractor_args"] = {
                 "youtube": {
                     "player_client": clients,
-                    "player_skip": ["webpage", "configs"],
-                }
-            }
-        elif is_yt:
-            ydl_opts["extractor_args"] = {
-                "youtube": {
-                    "player_skip": ["webpage", "configs"],
                 }
             }
 

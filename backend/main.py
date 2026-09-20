@@ -74,9 +74,19 @@ def _get_stream_headers(url: str) -> dict:
     key = _clean_url_key(url)
     if key in _STREAM_HEADERS:
         return _STREAM_HEADERS[key]
+    
+    # Khusus googlevideo: Cocokkan parameter id= unik video
+    if "googlevideo.com" in url:
+        m = re.search(r"[?&]id=([^&]+)", url)
+        if m:
+            v_id = m.group(1)
+            for stored_key, stored_headers in reversed(_STREAM_HEADERS.items()):
+                if f"id={v_id}" in stored_key:
+                    return stored_headers
+
     base = key.split("?")[0]
     for stored_key, stored_headers in reversed(_STREAM_HEADERS.items()):
-        if base and base in stored_key:
+        if "googlevideo.com" not in base and base and base in stored_key:
             return stored_headers
     return {}
 
@@ -96,7 +106,12 @@ def _fallback_headers_for(url: str) -> dict:
     if any(s in host or s in low for s in ("cdninstagram", "instagram.com", "instagr.am", "fbcdn", "facebook.com", "fb.watch")):
         return {"User-Agent": DESKTOP_UA, "Referer": "https://www.instagram.com/", "Accept": "*/*", "Sec-Fetch-Mode": "cors"}
     if any(s in host or s in low for s in ("googlevideo.com", "youtube.com", "youtu.be", "ytimg")):
-        return {"User-Agent": DESKTOP_UA, "Accept": "*/*"}
+        return {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Sec-Fetch-Mode": "navigate"
+        }
     if any(s in host or s in low for s in ("twimg.com", "twitter.com", "x.com", "t.co")):
         return {"User-Agent": DESKTOP_UA, "Referer": "https://x.com/", "Accept": "*/*"}
     return {"User-Agent": DESKTOP_UA, "Accept": "*/*"}

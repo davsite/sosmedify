@@ -21,6 +21,8 @@ backend/temp_media/*
 !backend/temp_media/.gitkeep
 temp_media/*
 !temp_media/.gitkeep
+scratch/
+*.tmp
 
 # Frontend Build
 frontend/dist/
