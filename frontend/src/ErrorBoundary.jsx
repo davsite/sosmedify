@@ -12,7 +12,7 @@ export class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Sosmedify Uncaught Render Error:', error, errorInfo);
+    console.error('OmniKlip Uncaught Render Error:', error, errorInfo);
   }
 
   render() {

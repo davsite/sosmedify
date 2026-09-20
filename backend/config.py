@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     )
 
     # General & App Settings
-    APP_NAME: str = "Sosmedify Converter Service"
+    APP_NAME: str = "OmniKlip Converter Service"
     DEBUG: bool = False
     TEMP_DIR: str = Field(default="./temp_media", description="Path lokal folder temporary")
 

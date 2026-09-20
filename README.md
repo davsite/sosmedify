@@ -1,19 +1,19 @@
 <div align="center">
 
-  <img src="docs/banner.jpg" alt="Sosmedify Studio UI Showcase Banner" width="100%" style="border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.1);" />
+  <img src="docs/banner.jpg" alt="OmniKlip Studio UI Showcase Banner" width="100%" style="border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.1);" />
 
   <br/><br/>
 
-  # ⚡ 𝐒 𝐎 𝐒 𝐌 𝐄 𝐃 𝐈 𝐅 𝐘
-  ### 「 ソスメディファイ 」· Next-Gen Universal Media Ingestion & Video Studio
+  # ⚡ 𝐎 𝐌 𝐍 𝐈 𝐊 𝐋 𝐈 𝐏
+  ### 「 オムニクリップ 」· Next-Gen Universal Media Ingestion & Video Studio
   
   <p align="center">
     <b>Enterprise-grade social media extraction engine, frame-accurate FFmpeg trimmer, and dual-client ecosystem (Vite React 19 + Standalone Android APK).</b>
   </p>
 
   <p align="center">
-    <a href="https://sosmedify.vercel.app" target="_blank">
-      <img src="https://img.shields.io/badge/🌐_Live_Demo-sosmedify.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" />
+    <a href="https://omniklip.vercel.app" target="_blank">
+      <img src="https://img.shields.io/badge/🌐_Live_Demo-omniklip.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" />
     </a>
     <a href="https://github.com/davsite/sosmedify/releases/latest">
       <img src="https://img.shields.io/badge/📱_Download_APK-v1.0.0-06B6D4?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
@@ -95,7 +95,7 @@
 
 ## 🏗️ Sistem Arsitektur • System Architecture
 
-Sosmedify menggunakan pola arsitektur *decoupled microservice* yang mengisolasi antarmuka klien, gateway streaming berkinerja tinggi, dan orkestrasi pemrosesan FFmpeg:
+OmniKlip menggunakan pola arsitektur *decoupled microservice* yang mengisolasi antarmuka klien, gateway streaming berkinerja tinggi, dan orkestrasi pemrosesan FFmpeg:
 
 ```mermaid
 flowchart TD
@@ -180,7 +180,7 @@ Menganalisis link media sosial, mengurai link pendek (*shortlinks*), dan mengemb
 {
   "status": "success",
   "data": {
-    "title": "Sosmedify Video Showcase",
+    "title": "OmniKlip Video Showcase",
     "duration": 48.5,
     "thumbnail": "https://p16-sign.tiktokcdn.com/...jpg",
     "direct_url": "https://v16-webapp-prime.tiktokcdn.com/...mp4",
@@ -235,7 +235,7 @@ Menjalankan subproses pemotongan presisi (*frame-accurate trim*) dan konversi fo
 }
 ```
 
-**Response**: Berkas biner media langsung terunduh via streaming attachment dengan nama berkas `Sosmedify_00-05_00-18.mp4`.
+**Response**: Berkas biner media langsung terunduh via streaming attachment dengan nama berkas `OmniKlip_00-05_00-18.mp4`.
 </details>
 
 <details>
@@ -247,7 +247,7 @@ Digunakan oleh monitor infrastruktur (Railway, Docker health check, atau Uptime 
 ```json
 {
   "status": "HEALTHY",
-  "app_name": "Sosmedify Converter Service",
+  "app_name": "OmniKlip Converter Service",
   "redis_broker": "CONNECTED",
   "s3_storage_configured": false
 }
@@ -258,7 +258,7 @@ Digunakan oleh monitor infrastruktur (Railway, Docker health check, atau Uptime 
 
 ## 📱 Aplikasi Android (APK) • Mobile Client
 
-Sosmedify dilengkapi aplikasi native Android dalam folder [`android-app/`](android-app/) dengan arsitektur **Standalone Embedded Client**:
+OmniKlip dilengkapi aplikasi native Android dalam folder [`android-app/`](android-app/) dengan arsitektur **Standalone Embedded Client**:
 
 ```
 📱 Perangkat Android Pengguna
@@ -279,7 +279,7 @@ Sosmedify dilengkapi aplikasi native Android dalam folder [`android-app/`](andro
 
 | Berkas | Versi | Ukuran | Status Keamanan | Unduhan |
 | :--- | :---: | :---: | :---: | :---: |
-| **`sosmedify-v1.0.0.apk`** | `v1.0.0` | **~7 MB** | ![Verified](https://img.shields.io/badge/Security-Verified-10B981?style=flat-square) | [**⬇️ Unduh APK Langsung**](https://github.com/davsite/sosmedify/releases/download/v1.0.0/sosmedify-v1.0.0.apk) |
+| **`omniklip-v1.0.0.apk`** | `v1.0.0` | **~7 MB** | ![Verified](https://img.shields.io/badge/Security-Verified-10B981?style=flat-square) | [**⬇️ Unduh APK Langsung**](https://github.com/davsite/sosmedify/releases/download/v1.0.0/omniklip-v1.0.0.apk) |
 | **GitHub Releases** | `Semua` | - | ![GitHub](https://img.shields.io/badge/Official-Release-06B6D4?style=flat-square) | [**🌐 Kunjungi Releases**](https://github.com/davsite/sosmedify/releases) |
 
 > [!TIP]
@@ -386,7 +386,7 @@ Bebas digunakan, dikembangkan, dan dimodifikasi untuk kebutuhan personal maupun 
 
   <br/>
   <p>🍃 <i>Dibuat dengan presisi tinggi, dedikasi penuh, dan arsitektur yang tangguh.</i> 🌸</p>
-  <p><strong>Sosmedify by Dav'site</strong> • © 2026</p>
+  <p><strong>OmniKlip by Dav'site</strong> • © 2026</p>
 
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/grass.png" width="100%" alt="Footer accent line" />
 
