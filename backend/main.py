@@ -3,24 +3,25 @@ import re
 import time
 import uuid
 import logging
+import shutil
 from collections import OrderedDict
-from typing import Optional, Dict, Any
-from urllib.parse import unquote, urlsplit
+from typing import Optional, Dict, Any, Literal
+from urllib.parse import urlsplit
 
-import requests
 import urllib3
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, Response, JSONResponse
 from starlette.background import BackgroundTask
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from celery.result import AsyncResult
 
 from config import settings
 from celery_app import celery_app
 from storage import storage_manager
 from scraper import extract_media_info, clean_url, DESKTOP_UA, MOBILE_UA
-from converter import convert_media, download_raw_media, safe_remove
+from converter import convert_media, download_media_sources, safe_remove
+from network import open_public_stream, UnsafeURL
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -43,6 +44,7 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Range", "Content-Length", "Accept-Ranges", "Content-Disposition"],
 )
 
 
@@ -56,39 +58,21 @@ _STREAM_HEADERS_MAX = 256
 def _clean_url_key(url: str) -> str:
     if not url:
         return ""
-    u = unquote(url).strip()
-    return re.sub(r"^https?://", "", u).rstrip("/")
+    return url.strip()
 
 
 def _remember_stream_headers(url: str, headers: dict):
     if not url or not headers:
         return
     key = _clean_url_key(url)
-    _STREAM_HEADERS[key] = headers
+    _STREAM_HEADERS[key] = {k: v for k, v in headers.items() if k.lower() != "range"}
     _STREAM_HEADERS.move_to_end(key)
     while len(_STREAM_HEADERS) > _STREAM_HEADERS_MAX:
         _STREAM_HEADERS.popitem(last=False)
 
 
 def _get_stream_headers(url: str) -> dict:
-    key = _clean_url_key(url)
-    if key in _STREAM_HEADERS:
-        return _STREAM_HEADERS[key]
-    
-    # Khusus googlevideo: Cocokkan parameter id= unik video
-    if "googlevideo.com" in url:
-        m = re.search(r"[?&]id=([^&]+)", url)
-        if m:
-            v_id = m.group(1)
-            for stored_key, stored_headers in reversed(_STREAM_HEADERS.items()):
-                if f"id={v_id}" in stored_key:
-                    return stored_headers
-
-    base = key.split("?")[0]
-    for stored_key, stored_headers in reversed(_STREAM_HEADERS.items()):
-        if "googlevideo.com" not in base and base and base in stored_key:
-            return stored_headers
-    return {}
+    return dict(_STREAM_HEADERS.get(_clean_url_key(url), {}))
 
 
 def _fallback_headers_for(url: str) -> dict:
@@ -122,15 +106,21 @@ def _fallback_headers_for(url: str) -> dict:
 # ---------------------------------------------------------------------------
 
 class URLRequest(BaseModel):
-    url: str
+    url: str = Field(min_length=1, max_length=4096)
 
 
 class ProcessRequest(BaseModel):
-    url: str
-    start_time: float = 0.0
-    end_time: float = 0.0
-    format: str = "mp4"
-    resolution: str = "best"
+    url: str = Field(min_length=1, max_length=4096)
+    start_time: float = Field(default=0.0, ge=0, allow_inf_nan=False)
+    end_time: float = Field(default=0.0, ge=0, allow_inf_nan=False)
+    format: Literal["mp4", "mp3"] = "mp4"
+    resolution: str = Field(default="best", pattern=r"^(best|[1-9][0-9]{1,3})$")
+
+    @model_validator(mode="after")
+    def valid_range(self):
+        if self.end_time and self.end_time <= self.start_time:
+            raise ValueError("Waktu selesai harus lebih besar dari waktu mulai.")
+        return self
 
 
 class JobAcceptedResponse(BaseModel):
@@ -173,141 +163,78 @@ def get_media_info(request: URLRequest):
         if info.get("direct_url") and info.get("stream_headers"):
             _remember_stream_headers(info["direct_url"], info["stream_headers"])
 
-        return {"status": "success", "data": info}
+        if info.get("audio_url"):
+            _remember_stream_headers(info["audio_url"], info.get("audio_headers") or info.get("stream_headers") or {})
+        public_info = {k: v for k, v in info.items() if k not in ("_formats", "stream_headers", "audio_headers")}
+        return {"status": "success", "data": public_info}
     except Exception as e:
         logger.error(f"Error di /api/info: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 
-stream_http_session = requests.Session()
-stream_adapter = requests.adapters.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=2)
-stream_http_session.mount("https://", stream_adapter)
-stream_http_session.mount("http://", stream_adapter)
-
-
 @app.get("/api/stream")
 @app.get("/stream")
 def stream_video_proxy(url: str, request: Request, vid: Optional[str] = None):
-    """Streaming Video Preview Proxy Universal untuk 7 platform sosmed."""
+    """Proxy public CDN media without trusting client-supplied hosts or redirects."""
+    response = pool = None
     try:
-        req_url = unquote(url).strip()
-        headers = _get_stream_headers(req_url)
-        if not headers:
-            headers = _fallback_headers_for(req_url)
-        else:
-            if "User-Agent" not in headers:
-                headers["User-Agent"] = DESKTOP_UA
-
-        # Teruskan Range Header dari Browser (Sangat penting untuk durasi dan timeline seek)
-        range_header = request.headers.get("Range") or request.headers.get("range")
+        req_url = url.strip()
+        headers = dict(_get_stream_headers(req_url) or _fallback_headers_for(req_url))
+        headers.pop("Range", None)
+        range_header = request.headers.get("range")
         if range_header:
             headers["Range"] = range_header
-
-        client_req = None
-        try:
-            client_req = stream_http_session.get(
-                req_url, headers=headers, stream=True, timeout=(6, 60), allow_redirects=True, verify=False
-            )
-        except Exception:
-            fb_headers = _fallback_headers_for(req_url)
+        attempts = [headers, _fallback_headers_for(req_url), {"User-Agent": DESKTOP_UA, "Accept": "*/*"}]
+        for candidate in attempts:
+            candidate = dict(candidate)
             if range_header:
-                fb_headers["Range"] = range_header
-            client_req = stream_http_session.get(
-                req_url, headers=fb_headers, stream=True, timeout=(6, 60), allow_redirects=True, verify=False
-            )
-
-        # Jika ditolak CDN karena IP mismatch (Google Video IP binding 403), refresh URL dari worker saat ini
-        if client_req.status_code in (403, 401, 400) and "googlevideo.com" in req_url:
-            client_req.close()
-            try:
-                v_target = vid or request.query_params.get("canonical_url")
-                if v_target:
-                    fresh_info = extract_media_info(v_target)
-                    new_direct = fresh_info.get("direct_url")
-                    if new_direct and new_direct != req_url:
-                        req_url = new_direct
-                        headers = fresh_info.get("stream_headers") or _fallback_headers_for(new_direct)
-                        if range_header:
-                            headers["Range"] = range_header
-                        client_req = stream_http_session.get(
-                            req_url, headers=headers, stream=True, timeout=(6, 60), allow_redirects=True, verify=False
-                        )
-            except Exception as re_err:
-                logger.warning(f"Re-extract stream fallback error: {re_err}")
-
-        # Jika ditolak CDN karena Referer/Auth, coba fallback headers
-        if client_req.status_code in (403, 401, 400):
-            client_req.close()
-            fb_headers = _fallback_headers_for(req_url)
-            if range_header:
-                fb_headers["Range"] = range_header
-            client_req = stream_http_session.get(
-                req_url, headers=fb_headers, stream=True, timeout=(6, 60), allow_redirects=True, verify=False
-            )
-            # Jika masih 403, coba tanpa Referer dengan Desktop UA standar
-            if client_req.status_code in (403, 401, 400):
-                client_req.close()
-                bare_headers = {"User-Agent": DESKTOP_UA, "Accept": "*/*"}
-                if range_header:
-                    bare_headers["Range"] = range_header
-                client_req = stream_http_session.get(
-                    req_url, headers=bare_headers, stream=True, timeout=(6, 60), allow_redirects=True, verify=False
-                )
-
+                candidate["Range"] = range_header
+            response, pool = open_public_stream(req_url, candidate)
+            if response.status not in (400, 401, 403):
+                break
+            response.close()
+            pool.close()
+        upstream_status = response.status
         resp_headers = {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
-            "Access-Control-Allow-Headers": "Range, Content-Range, Accept-Ranges, Content-Type, Origin",
-            "Access-Control-Expose-Headers": "Content-Range, Content-Length, Accept-Ranges, Content-Type",
-            "Accept-Ranges": "bytes",
+            k: v for k, v in response.headers.items()
+            if k.lower() in ("content-type", "content-range", "accept-ranges", "etag", "last-modified")
         }
+        if upstream_status == 416:
+            response.close()
+            pool.close()
+            return Response(status_code=416, headers=resp_headers)
+        if upstream_status not in (200, 206):
+            raise HTTPException(status_code=502, detail=f"CDN server status: {upstream_status}")
+        if upstream_status == 206 and not response.headers.get("Content-Range"):
+            raise HTTPException(status_code=502, detail="CDN mengirim partial content tanpa Content-Range.")
+        content_type = response.headers.get("Content-Type", "").lower()
+        if any(kind in content_type for kind in ("text/", "application/json")):
+            raise HTTPException(status_code=502, detail="CDN tidak mengembalikan media.")
 
-        if client_req.status_code not in (200, 206, 304):
-            client_req.close()
-            raise HTTPException(status_code=client_req.status_code, detail=f"CDN server status: {client_req.status_code}")
-
-        for key, value in client_req.headers.items():
-            k_low = key.lower()
-            if k_low in ("content-type", "content-range", "last-modified", "etag"):
-                resp_headers[key] = value
-
-        ct = (resp_headers.get("content-type") or resp_headers.get("Content-Type") or "").lower()
-        if not ct or "html" in ct or "json" in ct or "text" in ct:
-            resp_headers["Content-Type"] = "video/mp4"
-
-        status_code = client_req.status_code
-        # Ambil content-length dari CDN untuk membangun Content-Range jika belum ada
-        cl = client_req.headers.get("content-length") or client_req.headers.get("Content-Length")
-        has_cr = any(k.lower() == "content-range" for k in resp_headers.keys())
-        
-        if status_code == 200 and range_header and cl and str(cl).isdigit() and not has_cr:
-            total = int(cl)
-            resp_headers["Content-Range"] = f"bytes 0-{total - 1}/{total}"
-            status_code = 206
-        elif status_code == 206 and not has_cr and cl and str(cl).isdigit():
-            total = int(cl)
-            resp_headers["Content-Range"] = f"bytes 0-{total - 1}/{total}"
-
-        # JANGAN sertakan Content-Length dalam StreamingResponse agar Uvicorn tidak melempar
-        # 'RuntimeError: Response content longer than Content-Length' akibat perbedaan chunking/dekompresi
-        resp_headers.pop("content-length", None)
-        resp_headers.pop("Content-Length", None)
-
-        if status_code not in (200, 206, 304):
-            status_code = 206 if range_header else 200
+        def close_stream():
+            response.close()
+            pool.close()
 
         def generate():
             try:
-                for chunk in client_req.iter_content(chunk_size=1024 * 128):
-                    if chunk:
-                        yield chunk
+                yield from response.stream(amt=128 * 1024, decode_content=True)
             finally:
-                client_req.close()
+                close_stream()
 
-        return StreamingResponse(generate(), status_code=status_code, headers=resp_headers)
-    except Exception as e:
-        logger.error(f"Error di /api/stream proxy: {e}")
-        raise HTTPException(status_code=500, detail=f"Gagal streaming preview video: {str(e)}")
+        # Preserve the actual upstream status/range. Never fabricate a 206 response.
+        return StreamingResponse(generate(), status_code=upstream_status, headers=resp_headers,
+                                 background=BackgroundTask(close_stream))
+    except Exception as exc:
+        if response is not None:
+            response.close()
+        if pool is not None:
+            pool.close()
+        if isinstance(exc, HTTPException):
+            raise
+        if isinstance(exc, UnsafeURL):
+            raise HTTPException(status_code=400, detail=str(exc))
+        logger.warning("Preview stream failed: %s", exc)
+        raise HTTPException(status_code=502, detail="Gagal menghubungi server media.")
 
 
 @app.post("/api/process")
@@ -318,6 +245,7 @@ def process_and_download_sync(req: ProcessRequest):
     ext = req.format.lower().strip() if req.format.lower().strip() in ("mp4", "mp3") else "mp4"
     raw_path = os.path.join(settings.TEMP_DIR, f"{file_id}_raw.tmp")
     final_path = os.path.join(settings.TEMP_DIR, f"{file_id}_final.{ext}")
+    audio_path = os.path.join(settings.TEMP_DIR, f"{file_id}_audio.tmp")
 
     try:
         # Ekstrak link stream mentah
@@ -328,11 +256,8 @@ def process_and_download_sync(req: ProcessRequest):
             raise Exception("URL stream langsung tidak dapat ditemukan.")
 
         # Unduh stream mentah dengan fallback URL kanonikal
-        download_raw_media(
-            direct_url,
-            raw_path,
-            headers=info.get("stream_headers"),
-            original_url=info.get("canonical_url") or target_url
+        separate_audio = download_media_sources(
+            info, raw_path, audio_path, target_url, req.resolution, ext
         )
 
         # Konversi menggunakan FFmpeg
@@ -342,10 +267,12 @@ def process_and_download_sync(req: ProcessRequest):
             output_format=ext,
             start_time=req.start_time,
             end_time=req.end_time,
-            resolution=req.resolution
+            resolution=req.resolution,
+            audio_path=separate_audio
         )
 
         safe_remove(raw_path)
+        safe_remove(audio_path)
 
         download_filename = f"OmniKlip_{int(time.time())}.{ext}"
         is_youtube = any(s in target_url.lower() for s in ("youtube.com", "youtu.be"))
@@ -363,8 +290,11 @@ def process_and_download_sync(req: ProcessRequest):
         )
     except Exception as e:
         safe_remove(raw_path)
+        safe_remove(audio_path)
         safe_remove(final_path)
         logger.error(f"Error di /api/process: {e}")
+        if isinstance(e, UnsafeURL):
+            raise HTTPException(status_code=400, detail=str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -380,6 +310,8 @@ def process_and_download_sync(req: ProcessRequest):
 )
 @app.post("/api/convert", response_model=JobAcceptedResponse, status_code=status.HTTP_202_ACCEPTED)
 def enqueue_convert_job(request: ProcessRequest):
+    if not storage_manager.is_configured():
+        raise HTTPException(status_code=503, detail="Antrean konversi membutuhkan S3/R2. Gunakan /api/process untuk unduhan langsung.")
     if not request.url or not request.url.strip():
         raise HTTPException(status_code=400, detail="Parameter 'url' wajib diisi.")
 
@@ -436,21 +368,25 @@ def root():
 @app.get("/api/health")
 @app.get("/health")
 def health_check():
-    redis_status = "UNKNOWN"
+    from redis import Redis
+    redis_status = "UNAVAILABLE"
     try:
-        with celery_app.pool.acquire(block=True) as conn:
-            conn.default_channel.ping()
+        with Redis.from_url(settings.REDIS_URL, socket_connect_timeout=1, socket_timeout=1) as conn:
+            conn.ping()
         redis_status = "CONNECTED"
-    except Exception as e:
-        redis_status = f"ERROR: {str(e)}"
+    except Exception:
+        pass
 
-    return {
-        "status": "HEALTHY",
+    ffmpeg_ready = shutil.which("ffmpeg") is not None
+    return JSONResponse(status_code=200 if ffmpeg_ready else 503, content={
+        "status": "HEALTHY" if ffmpeg_ready else "UNHEALTHY",
         "app_name": settings.APP_NAME,
+        "ffmpeg_available": ffmpeg_ready,
         "redis_broker": redis_status,
+        "queue_available": redis_status == "CONNECTED" and storage_manager.is_configured(),
         "s3_storage_configured": storage_manager.is_configured(),
         "bucket_name": settings.S3_BUCKET_NAME
-    }
+    })
 
 
 if __name__ == "__main__":

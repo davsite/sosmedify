@@ -12,6 +12,7 @@ import uuid
 import requests
 import urllib3
 from config import settings
+from network import validate_media_page, open_public_stream
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -56,10 +57,14 @@ def resolve_canonical_url(url: str) -> str:
         try:
             # Gunakan Mobile UA untuk redirect TikTok/Douyin/XHS agar tidak tersangkut bot verification
             headers = {"User-Agent": MOBILE_UA}
-            resp = requests.get(url, headers=headers, allow_redirects=True, verify=False, timeout=8)
-            if resp.url and resp.url.startswith("http"):
-                logger.info(f"Resolved shortlink '{url}' -> '{resp.url}'")
-                return resp.url
+            resp, pool = open_public_stream(url, headers, timeout=(6, 8))
+            try:
+                resolved = resp.media_url
+                validate_media_page(resolved)
+                return resolved
+            finally:
+                resp.close()
+                pool.close()
         except Exception as e:
             logger.debug(f"Gagal resolve redirect: {e}")
     return url
@@ -80,6 +85,8 @@ def _quality_ladder(formats: List[dict]) -> List[dict]:
         h = f.get("height")
         if h and f.get("vcodec") not in (None, "none"):
             h = int(h)
+            if settings.MAX_VIDEO_HEIGHT and h > settings.MAX_VIDEO_HEIGHT:
+                continue
             if h >= 144:
                 heights.add(h)
     
@@ -504,6 +511,22 @@ def _extract_youtube_fallback(url: str) -> Optional[Dict[str, Any]]:
 
                 # 1. Coba format gabungan (video + audio)
                 streams = data.get("formatStreams") or []
+                export_formats = []
+                for entry in streams + (data.get("adaptiveFormats") or []):
+                    if not entry.get("url"):
+                        continue
+                    mime = entry.get("type", "")
+                    is_audio = mime.startswith("audio")
+                    resolution_text = str(entry.get("resolution") or entry.get("qualityLabel") or "0").split("x")[-1]
+                    height_match = re.search(r"\d+", resolution_text)
+                    export_formats.append({
+                        "url": entry["url"],
+                        "height": int(height_match.group()) if height_match and not is_audio else 0,
+                        "ext": entry.get("container") or ("m4a" if is_audio else "mp4"),
+                        "vcodec": "none" if is_audio else "video",
+                        "acodec": "audio" if is_audio or entry in streams else "none",
+                        "tbr": float(entry.get("bitrate") or 0) / 1000,
+                    })
                 chosen_url = None
                 for s in streams:
                     if s.get("url") and s.get("container") in ("mp4", "webm"):
@@ -520,7 +543,7 @@ def _extract_youtube_fallback(url: str) -> Optional[Dict[str, Any]]:
                     v_cands = [f for f in adaptive if f.get("type", "").startswith("video") and f.get("url")]
                     a_cands = [f for f in adaptive if f.get("type", "").startswith("audio") and f.get("url")]
                     if v_cands:
-                        v_cands.sort(key=lambda x: int(x.get("resolution", "0x0").split("x")[-1] or 0))
+                        v_cands.sort(key=lambda x: next((f["height"] for f in export_formats if f["url"] == x["url"]), 0))
                         chosen_url = v_cands[-1]["url"]
                     if a_cands:
                         audio_url = a_cands[-1]["url"]
@@ -533,12 +556,8 @@ def _extract_youtube_fallback(url: str) -> Optional[Dict[str, Any]]:
                         "duration": duration,
                         "direct_url": chosen_url,
                         "audio_url": audio_url,
-                        "qualities": [
-                            {"label": "1080p Full HD", "height": 1080},
-                            {"label": "720p HD", "height": 720},
-                            {"label": "480p SD", "height": 480},
-                            {"label": "360p SD", "height": 360}
-                        ],
+                        "_formats": export_formats,
+                        "qualities": _quality_ladder(export_formats),
                         "stream_headers": {
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
                             "Accept": "*/*",
@@ -742,6 +761,7 @@ def _extract_with_ytdlp(url: str, custom_headers: Optional[dict] = None) -> Dict
 
     # 4. Ekstraksi dedicated audio stream jika video yang dipilih tidak memiliki audio
     audio_url = None
+    audio_headers = None
     if chosen and chosen.get("acodec") in (None, "none"):
         audio_cands = [
             f for f in formats
@@ -752,6 +772,7 @@ def _extract_with_ytdlp(url: str, custom_headers: Optional[dict] = None) -> Dict
         if audio_cands:
             audio_cands.sort(key=lambda x: (1 if x.get("ext") in ("m4a", "mp4", "mp3") else 0, float(x.get("tbr") or x.get("abr") or 0)))
             audio_url = audio_cands[-1].get("url")
+            audio_headers = audio_cands[-1].get("http_headers")
 
     dur = info.get("duration")
     duration = int(dur) if dur and dur > 0 else 0
@@ -779,6 +800,8 @@ def _extract_with_ytdlp(url: str, custom_headers: Optional[dict] = None) -> Dict
         "duration": duration,
         "direct_url": final_url,
         "audio_url": audio_url,
+        "audio_headers": audio_headers,
+        "_formats": [f for f in formats if is_playable_stream(f)],
         "qualities": _quality_ladder(formats),
         "stream_headers": stream_headers
     }
@@ -802,6 +825,7 @@ def extract_media_info(raw_url: str) -> Dict[str, Any]:
     clean_target = clean_url(raw_url)
     if not clean_target or not clean_target.startswith("http"):
         raise ValueError("URL tidak valid. Harap sertakan URL lengkap http:// atau https://.")
+    validate_media_page(clean_target)
 
     # Resolve tautan pendek (vm.tiktok.com, v.douyin.com, youtu.be, dll.)
     target_url = resolve_canonical_url(clean_target)

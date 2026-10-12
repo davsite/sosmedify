@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { backendUrl, checkBackend, processPayload } from './mediaClient';
 import {
   Search, Download, Loader2, AlertCircle, CheckCircle,
   Tv, Camera, Music, Globe, Image as ImageIcon,
@@ -8,17 +9,7 @@ import {
   ChevronDown, ChevronUp, HelpCircle, Info, FileText, Check, Shield, Layers, ArrowRight
 } from 'lucide-react';
 
-const getBackendUrl = () => {
-  const viteUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) || '';
-  const reactAppUrl = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) || '';
-  const envUrl = viteUrl || reactAppUrl;
-  if (envUrl && typeof envUrl === 'string' && !envUrl.includes('vercel.app') && !envUrl.includes('localhost')) {
-    return envUrl.replace(/\/+$/, '');
-  }
-  return 'https://convertallsosmed-production.up.railway.app';
-};
-
-const API = getBackendUrl();
+const API = backendUrl(import.meta.env.VITE_API_URL, import.meta.env.DEV);
 
 /* ---- 7 Platform Sosial Media ---------------------------------------------- */
 const PLATFORMS = [
@@ -329,7 +320,7 @@ export default function App() {
   const [videoRatio, setVideoRatio] = useState('Otomatis');
   const [toast, setToast] = useState('');
   const [prog, setProg] = useState(null);
-  const [backendPing, setBackendPing] = useState({ online: true, latency: 38 });
+  const [backendPing, setBackendPing] = useState({ online: null, latency: null });
   const [openFaq, setOpenFaq] = useState(0);
   const [activeModal, setActiveModal] = useState(null);
 
@@ -345,36 +336,31 @@ export default function App() {
   const audioRef = useRef(null);
   const trackRef = useRef(null);
   const dragRef = useRef(null);
+  const infoRequestRef = useRef(null);
+  const downloadStartedRef = useRef(null);
+  const downloadInFlightRef = useRef(false);
   const dark = theme === 'dark';
 
   // Cek latency backend saat awal load
   useEffect(() => {
-    const checkHealth = async () => {
-      const t0 = Date.now();
-      try {
-        const res = await fetch(`${API}/api/health`, { method: 'GET' });
-        if (res.ok) {
-          const lat = Math.max(10, Date.now() - t0);
-          setBackendPing({ online: true, latency: lat });
-        } else {
-          setBackendPing({ online: true, latency: 50 });
-        }
-      } catch (_) {
-        setBackendPing({ online: true, latency: 45 });
-      }
-    };
-    checkHealth();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    let mounted = true;
+    checkBackend(API, controller.signal).then((health) => {
+      if (mounted) setBackendPing(health);
+    }).finally(() => clearTimeout(timeout));
+    return () => { mounted = false; clearTimeout(timeout); controller.abort(); };
   }, []);
+
+  useEffect(() => () => infoRequestRef.current?.abort(), []);
 
   // Timer live pemrosesan unduhan
   useEffect(() => {
     if (state !== 'processing' && state !== 'downloading') {
       return;
     }
-    const startT = Date.now();
-    setElapsedMs(0);
     const interval = setInterval(() => {
-      setElapsedMs(Date.now() - startT);
+      setElapsedMs(Date.now() - downloadStartedRef.current);
     }, 100);
     return () => clearInterval(interval);
   }, [state]);
@@ -403,7 +389,7 @@ export default function App() {
     return () => clearTimeout(id);
   }, [toast]);
 
-  const active = platformOf(url);
+  const active = platformOf((state === 'preview' || state === 'processing' || state === 'downloading') ? video.canonicalUrl : url);
   const busy = state === 'processing' || state === 'downloading';
 
   const resOptions = useMemo(() => {
@@ -529,13 +515,18 @@ export default function App() {
   };
 
   const fetchInfo = async () => {
-    if (!url.trim()) return;
+    if (!url.trim() || downloadInFlightRef.current) return;
+    infoRequestRef.current?.abort();
+    const controller = new AbortController();
+    infoRequestRef.current = controller;
+    const requestedUrl = url.trim();
     setState('parsing'); setError(''); setVideoError(false);
     try {
       const r = await fetch(`${API}/api/info`, {
+        signal: controller.signal,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url.trim() }),
+        body: JSON.stringify({ url: requestedUrl }),
       });
       const rawText = await r.text();
       let j = {};
@@ -550,6 +541,7 @@ export default function App() {
       if (!r.ok) throw new Error(j.detail || j.message || 'Tautan gagal dibaca oleh server.');
       const d = j.data;
       if (!d) throw new Error('Data media tidak ditemukan.');
+      if (controller.signal.aborted || infoRequestRef.current !== controller) return;
       const dur = d.duration || 60;
       setVideo({
         title: d.title || 'Video Media',
@@ -558,29 +550,30 @@ export default function App() {
         audioUrl: d.audio_url || '',
         duration: dur,
         qualities: d.qualities || [],
-        canonicalUrl: d.canonical_url || url.trim()
+        canonicalUrl: d.canonical_url || requestedUrl
       });
       setStart(0); setEnd(dur); setNow(0); setResolution('best'); setFormat('mp4');
       setVideoRatio('Otomatis'); setIsVertical(false);
       setVideoError(false); setStreamAttempt(0);
       setState('preview');
     } catch (e) {
+      if (controller.signal.aborted || infoRequestRef.current !== controller) return;
       setError(mapNetErr(e)); setState('error');
+    } finally {
+      if (infoRequestRef.current === controller) infoRequestRef.current = null;
     }
   };
 
   const download = async () => {
+    if (downloadInFlightRef.current || !video.canonicalUrl) return;
+    downloadInFlightRef.current = true;
+    downloadStartedRef.current = Date.now();
+    setElapsedMs(0);
     setState('processing'); setError(''); setProg(null);
     try {
       const r = await fetch(`${API}/api/process`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: url.trim(),
-          start_time: Number(start.toFixed(2)),
-          end_time: Number(end.toFixed(2)),
-          format,
-          resolution: format === 'mp4' ? resolution : 'best',
-        }),
+        body: JSON.stringify(processPayload(video, start, end, format, resolution)),
       });
       if (!r.ok) {
         const j = await r.json().catch(() => ({}));
@@ -609,7 +602,7 @@ export default function App() {
       const a = document.createElement('a');
       a.href = href;
 
-      const isYouTube = active?.key === 'youtube' || /youtube\.com|youtu\.be/.test(url) || /youtube\.com|youtu\.be/.test(video.canonicalUrl || '');
+      const isYouTube = /youtube\.com|youtu\.be/.test(video.canonicalUrl);
       let downloadFilename;
       if (isYouTube && video.title && video.title !== 'Video Media') {
         const safeTitle = video.title
@@ -633,9 +626,11 @@ export default function App() {
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(href);
       setState('preview'); setProg(null);
-      setToast(`✨ Berhasil diunduh dalam ${fmtElapsed(elapsedMs)}!`);
+      setToast(`✨ Berhasil diunduh dalam ${fmtElapsed(Date.now() - downloadStartedRef.current)}!`);
     } catch (e) {
       setError(mapNetErr(e)); setState('error'); setProg(null);
+    } finally {
+      downloadInFlightRef.current = false;
     }
   };
 
@@ -697,8 +692,7 @@ export default function App() {
         {/* Status Pill & Theme Switcher */}
         <div className="flex items-center gap-2 shrink-0">
           <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-studio-card text-[11px] font-mono text-slate-600 dark:text-slate-300 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>FFmpeg: <b className="text-emerald-500 dark:text-emerald-400 font-bold">Online</b> ({backendPing.latency}ms)</span>
+            <BackendStatus status={backendPing} />
           </div>
 
           <button
@@ -760,7 +754,12 @@ export default function App() {
 
               <input
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                disabled={busy}
+                onChange={(e) => {
+                  infoRequestRef.current?.abort();
+                  infoRequestRef.current = null;
+                  setUrl(e.target.value); setState('idle'); setError('');
+                }}
                 onKeyDown={(e) => e.key === 'Enter' && fetchInfo()}
                 placeholder="Tempel tautan video (YouTube, TikTok, IG, Douyin, FB, X, Rednote...)"
                 className="w-full py-2.5 sm:py-3.5 px-1 sm:px-2 text-xs sm:text-sm font-medium bg-transparent text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none min-w-0 font-mono"
@@ -770,7 +769,8 @@ export default function App() {
               <div className="flex items-center gap-1 sm:gap-1.5 pr-1 shrink-0">
                 {url ? (
                   <button
-                    onClick={() => { setUrl(''); setState('idle'); }}
+                    disabled={busy}
+                    onClick={() => { infoRequestRef.current?.abort(); infoRequestRef.current = null; setUrl(''); setState('idle'); }}
                     className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
                     title="Hapus tautan"
                   >
@@ -788,7 +788,7 @@ export default function App() {
 
                 <button
                   onClick={fetchInfo}
-                  disabled={state === 'parsing' || !url.trim()}
+                  disabled={busy || state === 'parsing' || !url.trim()}
                   className="btn-studio-gradient px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl font-display font-bold text-xs sm:text-sm text-white shadow-lg shadow-rose-500/25 transition-all disabled:opacity-40 flex items-center gap-1.5 active:scale-95 shrink-0 cursor-pointer"
                 >
                   {state === 'parsing' ? (
@@ -1361,7 +1361,7 @@ export default function App() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500 dark:text-slate-400">Kecepatan Server:</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Instan ({backendPing.latency}ms)</span>
+                    <BackendStatus status={backendPing} />
                   </div>
                 </div>
 
@@ -1791,6 +1791,12 @@ function AdNativeBanner() {
 
 /* ---- Professional Footer & Compliance Modals ----------------------------- */
 
+function BackendStatus({ status }) {
+  return <span role="status" className={status.online ? 'text-emerald-500' : 'text-slate-500'}>
+    {status.online === null ? 'Memeriksa server…' : status.online ? `Server Online (${status.latency}ms)` : 'Server Offline'}
+  </span>;
+}
+
 function Footer({ onOpenModal, backendPing }) {
   return (
     <footer className="relative z-20 mt-16 border-t border-slate-200/80 dark:border-white/10 bg-white/40 dark:bg-[#070A14]/80 backdrop-blur-xl pt-12 pb-10">
@@ -1812,8 +1818,7 @@ function Footer({ onOpenModal, backendPing }) {
               Layanan ekstraksi multimedia dan pemotong video presisi milidetik online gratis untuk TikTok, Instagram, YouTube, Douyin, FB, X, dan Rednote.
             </p>
             <div className="flex items-center gap-2 pt-1 text-[11px] font-mono text-slate-500 dark:text-slate-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>FFmpeg Cloud Engine: <strong className="text-emerald-500 dark:text-emerald-400">Aktif</strong> ({backendPing?.latency || 38}ms)</span>
+              <BackendStatus status={backendPing} />
             </div>
           </div>
 

@@ -73,7 +73,7 @@ class StorageManager:
     def generate_presigned_url(self, object_key: str, expiration: Optional[int] = None) -> str:
         """Buat Presigned Download URL sementara dengan waktu kadaluarsa."""
         if not self.is_configured():
-            return f"/api/download/local/{object_key}"
+            raise RuntimeError("Storage S3/R2 belum dikonfigurasi untuk unduhan hasil antrean.")
 
         exp = expiration or settings.PRESIGNED_EXPIRATION
         try:

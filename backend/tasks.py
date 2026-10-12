@@ -6,7 +6,7 @@ from typing import Dict, Any
 from celery_app import celery_app
 from config import settings
 from scraper import extract_media_info
-from converter import download_raw_media, convert_media, extract_metadata, safe_remove
+from converter import download_media_sources, convert_media, extract_metadata, safe_remove
 from storage import storage_manager
 
 logger = logging.getLogger(__name__)
@@ -30,12 +30,15 @@ def process_media_task(self, job_id: str, payload: Dict[str, Any]) -> Dict[str, 
     end_time = float(payload.get("end_time") or 0.0)
 
     raw_file = os.path.join(settings.TEMP_DIR, f"{job_id}_raw.tmp")
+    audio_file = os.path.join(settings.TEMP_DIR, f"{job_id}_audio.tmp")
     final_file = os.path.join(settings.TEMP_DIR, f"{job_id}_final.{output_format}")
     s3_key = f"conversions/{job_id}.{output_format}"
 
     logger.info(f"[Task {job_id}] Mengawali pemrosesan URL: {url} (Format: {output_format})")
 
     try:
+        if not storage_manager.is_configured():
+            raise RuntimeError("Antrean konversi membutuhkan storage S3/R2.")
         # STEP 1: Scraping Raw URL
         self.update_state(state="PROCESSING", meta={"progress": 10, "step": "Ekstraksi URL & Metadata"})
         media_info = extract_media_info(url)
@@ -49,11 +52,8 @@ def process_media_task(self, job_id: str, payload: Dict[str, Any]) -> Dict[str, 
 
         # STEP 2: Unduh Stream Mentah ke Lokal
         self.update_state(state="PROCESSING", meta={"progress": 35, "step": "Mengunduh Stream Mentah"})
-        download_raw_media(
-            direct_url,
-            raw_file,
-            headers=stream_headers,
-            original_url=media_info.get("canonical_url") or url
+        separate_audio = download_media_sources(
+            media_info, raw_file, audio_file, media_info.get("canonical_url") or url, resolution, output_format
         )
 
         # STEP 3: Transcoding & Pemotongan FFmpeg
@@ -64,7 +64,8 @@ def process_media_task(self, job_id: str, payload: Dict[str, Any]) -> Dict[str, 
             output_format=output_format,
             start_time=start_time,
             end_time=end_time,
-            resolution=resolution
+            resolution=resolution,
+            audio_path=separate_audio
         )
 
         # Extrak metadata teknis hasil konversi
@@ -113,5 +114,6 @@ def process_media_task(self, job_id: str, payload: Dict[str, Any]) -> Dict[str, 
     finally:
         # STEP 6: Automatic Pembersihan File Lokal
         safe_remove(raw_file)
+        safe_remove(audio_file)
         safe_remove(final_file)
         logger.info(f"[Task {job_id}] Pembersihan file temporary lokal selesai.")

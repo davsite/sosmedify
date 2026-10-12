@@ -3,8 +3,9 @@ import time
 import logging
 import subprocess
 from typing import Dict, Any, Optional
-import requests
 from config import settings
+from media_sources import select_sources
+from network import open_public_stream
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ def safe_remove(filepath: str) -> None:
             time.sleep(0.1)
 
 
-def download_raw_media(direct_url: str, output_path: str, headers: Optional[dict] = None, original_url: Optional[str] = None) -> str:
+def download_raw_media(direct_url: str, output_path: str, headers: Optional[dict] = None, original_url: Optional[str] = None, format_id: Optional[str] = None) -> str:
     """Mengunduh stream video/audio mentah dari CDN ke disk lokal."""
     req_headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -42,29 +43,32 @@ def download_raw_media(direct_url: str, output_path: str, headers: Optional[dict
 
     for h in header_attempts:
         try:
-            with requests.get(direct_url, headers=h, stream=True, timeout=40, verify=False, allow_redirects=True) as response:
-                if response.status_code not in (200, 206):
+            response, pool = open_public_stream(direct_url, h, timeout=(6, 40))
+            try:
+                if response.status not in (200, 206):
                     continue
                 content_type = (response.headers.get("Content-Type") or "").lower()
                 if "text/html" in content_type or "application/json" in content_type:
                     continue
 
                 with open(output_path, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=1024 * 512):
+                    for chunk in response.stream(amt=1024 * 512, decode_content=True):
                         if chunk:
                             f.write(chunk)
                 if os.path.exists(output_path) and os.path.getsize(output_path) > 1024:
                     download_ok = True
                     break
+            finally:
+                response.close()
+                pool.close()
         except Exception as e:
             logger.warning(f"Direct stream download attempt failed ({e}), mencoba strategi selanjutnya...")
             safe_remove(output_path)
 
     if not download_ok:
         fallback_targets = []
-        if original_url:
+        if original_url and format_id:
             fallback_targets.append(original_url)
-        fallback_targets.append(direct_url)
 
         import yt_dlp
         import random
@@ -80,9 +84,9 @@ def download_raw_media(direct_url: str, output_path: str, headers: Optional[dict
                     ydl_opts = {
                         "quiet": True,
                         "no_warnings": True,
-                        "nocheckcertificate": True,
+                        "noplaylist": True,
                         "outtmpl": output_path,
-                        "format": "bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best/18",
+                        "format": format_id,
                         "merge_output_format": "mp4",
                         "socket_timeout": 20,
                         "retries": 2,
@@ -122,11 +126,26 @@ def download_raw_media(direct_url: str, output_path: str, headers: Optional[dict
             if download_ok:
                 break
 
-    if not os.path.exists(output_path) or os.path.getsize(output_path) < 1024:
+    if not download_ok or not os.path.exists(output_path) or os.path.getsize(output_path) < 1024:
         safe_remove(output_path)
         raise Exception("Gagal mengunduh file media mentah dari CDN (file kosong atau corrupt).")
 
     return output_path
+
+
+def download_media_sources(info, raw_path, audio_path, original_url, resolution="best", output_format="mp4"):
+    primary, audio = select_sources(info, resolution, output_format, settings.MAX_VIDEO_HEIGHT)
+    try:
+        fallback_format = "bestaudio/best" if output_format == "mp3" else "best"
+        download_raw_media(primary["url"], raw_path, primary["headers"], original_url, primary["format_id"] or fallback_format)
+        if audio:
+            download_raw_media(audio["url"], audio_path, audio["headers"], original_url, audio["format_id"] or "bestaudio/best")
+            return audio_path
+        return None
+    except Exception:
+        safe_remove(raw_path)
+        safe_remove(audio_path)
+        raise
 
 
 def convert_media(
@@ -135,7 +154,8 @@ def convert_media(
     output_format: str = "mp4",
     start_time: float = 0.0,
     end_time: float = 0.0,
-    resolution: str = "best"
+    resolution: str = "best",
+    audio_path: Optional[str] = None
 ) -> str:
     """
     Mengonversi & memotong file media menggunakan CLI Subprocess FFmpeg.
@@ -160,6 +180,14 @@ def convert_media(
     # Memasukkan input terlebih dahulu sebelum -ss agar FFmpeg men-decode frame secara presisi
     # dan tidak melompat (snapping) ke keyframe I-frame terdekat.
     cmd.extend(["-i", input_path])
+    if audio_path:
+        if not os.path.isfile(audio_path):
+            raise FileNotFoundError("Sumber audio terpisah tidak ditemukan.")
+        cmd.extend(["-i", audio_path])
+        if is_mp3:
+            cmd.extend(["-map", "1:a:0"])
+        else:
+            cmd.extend(["-map", "0:v:0", "-map", "1:a:0"])
 
     if start > 0:
         cmd.extend(["-ss", f"{start:.3f}"])
@@ -185,7 +213,7 @@ def convert_media(
         if resolution != "best":
             digits = "".join(c for c in str(resolution) if c.isdigit())
             if digits:
-                target_h = int(digits)
+                target_h = min(int(digits), target_h) if target_h else int(digits)
 
         if target_h and target_h > 0:
             vf_filters.append(f"scale=-2:'min({target_h},ih)'")
