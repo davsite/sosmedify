@@ -1,11 +1,7 @@
 <div align="center">
 
-  <img src="docs/banner.jpg" alt="OmniKlip Studio UI Showcase Banner" width="100%" style="border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.1);" />
-
-  <br/><br/>
-
-  # ⚡ 𝐎 𝐌 𝐍 𝐈 𝐊 𝐋 𝐈 𝐏
-  ### 「 オムニクリップ 」· Next-Gen Universal Media Ingestion & Video Studio
+  # ⚡ Kliprava
+  ### Unduh, potong, dan simpan video dalam satu tempat.
   
   <p align="center">
     <b>Enterprise-grade social media extraction engine, frame-accurate FFmpeg trimmer, and dual-client ecosystem (Vite React 19 + Standalone Android APK).</b>
@@ -36,7 +32,7 @@
     <img src="https://img.shields.io/badge/FFmpeg-7.x%20Proxy-007808?style=flat-square&logo=ffmpeg&logoColor=white" alt="FFmpeg" />
     <img src="https://img.shields.io/badge/yt--dlp-Active%20Engine-FF0000?style=flat-square&logo=youtube&logoColor=white" alt="yt-dlp" />
     <img src="https://img.shields.io/badge/Docker-Multi--stage-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" />
-    <img src="https://img.shields.io/badge/Railway-Production-0B0D0E?style=flat-square&logo=railway&logoColor=white" alt="Railway" />
+    <img src="https://img.shields.io/badge/Render-Free_Hobby_Config-0B0D0E?style=flat-square&logo=render&logoColor=white" alt="Konfigurasi Render Free tersedia" />
   </p>
 
   <!-- Quick Nav -->
@@ -95,7 +91,7 @@
 
 ## 🏗️ Sistem Arsitektur • System Architecture
 
-OmniKlip menggunakan pola arsitektur *decoupled microservice* yang mengisolasi antarmuka klien, gateway streaming berkinerja tinggi, dan orkestrasi pemrosesan FFmpeg:
+Kliprava menggunakan pola arsitektur *decoupled microservice* yang mengisolasi antarmuka klien, gateway streaming berkinerja tinggi, dan orkestrasi pemrosesan FFmpeg:
 
 ```mermaid
 flowchart TD
@@ -180,7 +176,7 @@ Menganalisis link media sosial, mengurai link pendek (*shortlinks*), dan mengemb
 {
   "status": "success",
   "data": {
-    "title": "OmniKlip Video Showcase",
+    "title": "Kliprava Video Showcase",
     "duration": 48.5,
     "thumbnail": "https://p16-sign.tiktokcdn.com/...jpg",
     "direct_url": "https://v16-webapp-prime.tiktokcdn.com/...mp4",
@@ -235,7 +231,7 @@ Menjalankan subproses pemotongan presisi (*frame-accurate trim*) dan konversi fo
 }
 ```
 
-**Response**: Berkas biner media langsung terunduh via streaming attachment dengan nama berkas `OmniKlip_00-05_00-18.mp4`.
+**Response**: Berkas biner media langsung terunduh via streaming attachment dengan nama berkas `Kliprava_00-05_00-18.mp4`.
 </details>
 
 <details>
@@ -247,7 +243,7 @@ Digunakan oleh monitor infrastruktur (Railway, Docker health check, atau Uptime 
 ```json
 {
   "status": "HEALTHY",
-  "app_name": "OmniKlip Converter Service",
+  "app_name": "Kliprava Converter Service",
   "redis_broker": "CONNECTED",
   "s3_storage_configured": false
 }
@@ -258,7 +254,7 @@ Digunakan oleh monitor infrastruktur (Railway, Docker health check, atau Uptime 
 
 ## 📱 Aplikasi Android (APK) • Mobile Client
 
-OmniKlip dilengkapi aplikasi native Android dalam folder [`android-app/`](android-app/) dengan arsitektur **Standalone Embedded Client**:
+Kliprava dilengkapi aplikasi native Android dalam folder [`android-app/`](android-app/) dengan arsitektur **Standalone Embedded Client**:
 
 ```
 📱 Perangkat Android Pengguna
@@ -277,12 +273,14 @@ OmniKlip dilengkapi aplikasi native Android dalam folder [`android-app/`](androi
 
 ### 📥 Unduh Berkas APK Siap Pakai
 
-| Berkas | Versi | Ukuran | Status Keamanan | Unduhan |
+| Berkas | Versi | Ukuran | Status | Unduhan |
 | :--- | :---: | :---: | :---: | :---: |
-| **`omniklip-v1.0.0.apk`** | `v1.0.0` | **~7 MB** | ![Verified](https://img.shields.io/badge/Security-Verified-10B981?style=flat-square) | [**⬇️ Unduh APK Langsung**](https://github.com/davsite/sosmedify/releases/download/v1.0.0/omniklip-v1.0.0.apk) |
+| **`kliprava-v1.0.0.apk`** | `v1.0.0` | Sesuai hasil build | Dibuat oleh GitHub Actions | [**Lihat rilis terbaru**](https://github.com/davsite/sosmedify/releases/latest) |
 | **GitHub Releases** | `Semua` | - | ![GitHub](https://img.shields.io/badge/Official-Release-06B6D4?style=flat-square) | [**🌐 Kunjungi Releases**](https://github.com/davsite/sosmedify/releases) |
 
 > [!TIP]
+> APK bernama Kliprava tersedia setelah workflow **Build Kliprava APK** berhasil.
+>
 > **Keunggulan Aset Tertanam (*Offline-Ready UI*)**:
 > Seluruh antarmuka React 19 tersimpan langsung di dalam berkas APK. Saat dibuka, aplikasi langsung muncul tanpa menunggu koneksi internet memuat aset web. Komunikasi scraping dan konversi media tetap berjalan cepat melalui backend cloud Railway.
 
@@ -290,13 +288,20 @@ OmniKlip dilengkapi aplikasi native Android dalam folder [`android-app/`](androi
 
 ## 🏮 Panduan Deployment Production
 
-### 1. Deploy Backend ke Railway (Docker Container)
-1. Buka [Railway.app](https://railway.app) dan hubungkan akun GitHub Anda.
-2. Klik **New Project** → **Deploy from GitHub repo** → pilih repository ini.
-3. Railway otomatis mendeteksi [`railway.json`](railway.json) dan membangun container dari [`Dockerfile`](Dockerfile):
-   - Port default: `8080`.
-   - Healthcheck path: `/api/health`.
-4. Masuk ke menu **Settings** → **Networking** → klik **Generate Domain** (misal: `https://convertallsosmed-production.up.railway.app`).
+### 1. Pilih Backend Gratis di Luar Railway
+
+Lihat [perbandingan hosting dan panduan pemasangan](docs/hosting-gratis.md).
+Oracle Cloud Always Free menyediakan kapasitas yang lebih cocok untuk konversi
+video; Render Free lebih mudah dipasang untuk percobaan dengan beban ringan.
+
+Untuk Render, buka **New → Blueprint**, pilih repository ini, lalu gunakan
+[`render.yaml`](render.yaml). Konfigurasi memilih paket **Free**, Docker,
+health check `/api/health`, dan batas keluaran video 480p untuk mengurangi beban.
+Konversi panjang dan penggunaan bersamaan tetap bisa melampaui kapasitas gratis.
+
+Setelah layanan sehat, salin URL HTTPS dari dashboard untuk konfigurasi frontend.
+File konfigurasi ini belum berarti backend baru sudah terpasang. Endpoint lama
+tetap menjadi fallback sampai `VITE_API_URL` diisi dengan URL baru.
 
 ### 2. Deploy Frontend ke Vercel (Edge Network)
 1. Buka [Vercel](https://vercel.com) dan impor repository Anda.
@@ -307,7 +312,7 @@ OmniKlip dilengkapi aplikasi native Android dalam folder [`android-app/`](androi
    - **Output Directory**: `dist`
 3. Masukkan **Environment Variable**:
    ```env
-   VITE_API_URL=https://convertallsosmed-production.up.railway.app
+   VITE_API_URL=https://ALAMAT-BACKEND-DARI-DASHBOARD
    ```
 4. Klik **Deploy**. Webapp Anda langsung aktif secara global di Vercel Edge CDN!
 
@@ -319,7 +324,8 @@ OmniKlip dilengkapi aplikasi native Android dalam folder [`android-app/`](androi
 | :--- | :---: | :---: | :---: | :--- |
 | `PORT` | Backend | Tidak | `8080` | Port listen server FastAPI container. |
 | `DEBUG` | Backend | Tidak | `false` | Mode debug & verbose logging. |
-| `VITE_API_URL` | Frontend | **Ya** | `http://localhost:8000` | URL endpoint backend Railway (tanpa trailing slash `/`). |
+| `VITE_API_URL` | Frontend | **Ya untuk migrasi** | Lokal: `http://localhost:8000`; produksi: endpoint Railway lama | URL HTTPS backend baru; isi saat build lalu deploy ulang frontend. |
+| `MAX_VIDEO_HEIGHT` | Backend | Tidak | `1080`; Render Free: `480` | Batas tinggi video keluaran untuk mengurangi beban konversi. |
 | `YOUTUBE_COOKIES` | Backend | Tidak | `None` | Konten cookies Netscape untuk rotasi sesi YouTube jika dibutuhkan. |
 | `PROXIES` | Backend | Tidak | `[]` | JSON array proxy HTTP/SOCKS5 untuk rotasi alamat IP scraper. |
 | `S3_ENDPOINT_URL` | Storage | Tidak | `None` | Endpoint URL Cloudflare R2 / AWS S3 (opsional). |
@@ -386,7 +392,7 @@ Bebas digunakan, dikembangkan, dan dimodifikasi untuk kebutuhan personal maupun 
 
   <br/>
   <p>🍃 <i>Dibuat dengan presisi tinggi, dedikasi penuh, dan arsitektur yang tangguh.</i> 🌸</p>
-  <p><strong>OmniKlip by Dav'site</strong> • © 2026</p>
+  <p><strong>Kliprava by Dav'site</strong> • © 2026</p>
 
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/grass.png" width="100%" alt="Footer accent line" />
 

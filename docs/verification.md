@@ -16,6 +16,11 @@ yang menggunakan URL dari metadata preview. `npm run build` memeriksa build Reac
 development memakai `http://localhost:8000`; build produksi memakai endpoint
 Railway yang sudah digunakan proyek. Dev server frontend memakai port **3000**.
 
+Konfigurasi Render Free tersedia di `render.yaml`. Setelah backend baru aktif,
+isi `VITE_API_URL` dan build ulang frontend; lihat [panduan hosting](hosting-gratis.md).
+Nama tampilan aplikasi sekarang **Kliprava**. Alamat layanan tidak berubah hanya
+karena branding diganti.
+
 ## Backend
 
 ```powershell

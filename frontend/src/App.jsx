@@ -194,7 +194,7 @@ const STEPS = [
   {
     num: '02',
     title: 'Tempel & Ambil Media',
-    desc: 'Tempel tautan di bilah input OmniKlip di atas, kemudian klik tombol "Ambil Video" untuk memulai analisis instan.'
+    desc: 'Tempel tautan di bilah input Kliprava di atas, kemudian klik tombol "Ambil Video" untuk memulai analisis instan.'
   },
   {
     num: '03',
@@ -210,12 +210,12 @@ const STEPS = [
 
 const FAQS = [
   {
-    q: 'Apakah OmniKlip benar-benar gratis digunakan?',
-    a: 'Ya, OmniKlip 100% gratis tanpa batasan kuota harian, tanpa biaya langganan tersembunyi, dan tanpa perlu registrasi akun atau login. Anda dapat mengunduh dan memotong video sepuasnya.'
+    q: 'Apakah Kliprava benar-benar gratis digunakan?',
+    a: 'Ya, Kliprava 100% gratis tanpa batasan kuota harian, tanpa biaya langganan tersembunyi, dan tanpa perlu registrasi akun atau login. Anda dapat mengunduh dan memotong video sepuasnya.'
   },
   {
     q: 'Apakah video TikTok yang diunduh bebas dari watermark?',
-    a: 'Ya. OmniKlip secara otomatis mengekstrak berkas sumber murni tanpa logo tanda air (watermark) dari TikTok maupun Douyin, menghasilkan kualitas video yang jernih dan profesional.'
+    a: 'Ya. Kliprava secara otomatis mengekstrak berkas sumber murni tanpa logo tanda air (watermark) dari TikTok maupun Douyin, menghasilkan kualitas video yang jernih dan profesional.'
   },
   {
     q: 'Bagaimana cara memotong bagian tertentu dari video sebelum mengunduh?',
@@ -223,14 +223,14 @@ const FAQS = [
   },
   {
     q: 'Apakah saya bisa mengunduh hanya suara atau musiknya saja dalam format MP3?',
-    a: 'Tentu bisa! Pada panel pilihan format keluaran, pilih tab "MP3 Audio". OmniKlip akan mengekstrak suara berkualitas studio hingga 320kbps tanpa mengunduh visual video, sangat cocok untuk sound tren atau podcast.'
+    a: 'Tentu bisa! Pada panel pilihan format keluaran, pilih tab "MP3 Audio". Kliprava akan mengekstrak suara berkualitas studio hingga 320kbps tanpa mengunduh visual video, sangat cocok untuk sound tren atau podcast.'
   },
   {
-    q: 'Platform sosial media apa saja yang didukung oleh OmniKlip?',
-    a: 'OmniKlip mendukung 7 platform terpopuler: YouTube (video & Shorts), TikTok, Instagram (Reels & Feed), Douyin (抖音), Facebook Video, X (Twitter), dan Rednote (Xiaohongshu).'
+    q: 'Platform sosial media apa saja yang didukung oleh Kliprava?',
+    a: 'Kliprava mendukung 7 platform terpopuler: YouTube (video & Shorts), TikTok, Instagram (Reels & Feed), Douyin (抖音), Facebook Video, X (Twitter), dan Rednote (Xiaohongshu).'
   },
   {
-    q: 'Apakah OmniKlip menyimpan berkas video atau data pribadi saya di server?',
+    q: 'Apakah Kliprava menyimpan berkas video atau data pribadi saya di server?',
     a: 'Tidak sama sekali. Kami menerapkan prinsip privasi ketat (Zero-Logs). Seluruh pemrosesan media bersifat sementara (ephemeral) di server cloud kami dan otomatis terhapus segera setelah proses streaming atau unduhan selesai.'
   },
   {
@@ -238,8 +238,8 @@ const FAQS = [
     a: 'Beberapa video YouTube mungkin memiliki batasan usia (18+), bersifat privat, atau dilindungi kebijakan verifikasi bot YouTube. Jika terjadi kendala, silakan gunakan tautan video lain atau nikmati platform seperti TikTok dan Instagram yang memiliki rasio keberhasilan 99%.'
   },
   {
-    q: 'Apakah OmniKlip bisa digunakan di smartphone (Android & iPhone)?',
-    a: 'Ya! Tampilan OmniKlip sepenuhnya responsif dan dioptimalkan untuk layar sentuh di HP Android, iPhone, iPad, tablet, maupun laptop/PC pada semua peramban seperti Google Chrome, Safari, dan Firefox.'
+    q: 'Apakah Kliprava bisa digunakan di smartphone (Android & iPhone)?',
+    a: 'Ya! Tampilan Kliprava sepenuhnya responsif dan dioptimalkan untuk layar sentuh di HP Android, iPhone, iPad, tablet, maupun laptop/PC pada semua peramban seperti Google Chrome, Safari, dan Firefox.'
   }
 ];
 
@@ -250,7 +250,7 @@ const LEGAL_DOCS = {
     sections: [
       {
         heading: '1. Komitmen Privasi Nol Log (Zero-Logs)',
-        content: 'OmniKlip sangat menghormati privasi Anda. Kami tidak mengumpulkan data pribadi yang dapat mengidentifikasi Anda (PII), tidak meminta registrasi akun, tidak melacak riwayat penelusuran pribadi Anda, dan tidak pernah menjual data kepada pihak ketiga.'
+        content: 'Kliprava sangat menghormati privasi Anda. Kami tidak mengumpulkan data pribadi yang dapat mengidentifikasi Anda (PII), tidak meminta registrasi akun, tidak melacak riwayat penelusuran pribadi Anda, dan tidak pernah menjual data kepada pihak ketiga.'
       },
       {
         heading: '2. Pemrosesan URL & Media Sementara',
@@ -272,19 +272,19 @@ const LEGAL_DOCS = {
     sections: [
       {
         heading: '1. Penerimaan Ketentuan',
-        content: 'Dengan mengakses atau menggunakan situs web OmniKlip, Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui untuk terikat oleh Ketentuan Layanan ini serta mematuhi seluruh peraturan hukum yang berlaku.'
+        content: 'Dengan mengakses atau menggunakan situs web Kliprava, Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui untuk terikat oleh Ketentuan Layanan ini serta mematuhi seluruh peraturan hukum yang berlaku.'
       },
       {
         heading: '2. Batasan Penggunaan Wajar (Fair Use)',
-        content: 'OmniKlip disediakan semata-mata untuk penggunaan pribadi yang wajar (personal fair use), tujuan edukasi, atau pencadangan arsip konten milik Anda sendiri. Pengguna dilarang memanfaatkan alat ini untuk tujuan komersial tanpa izin pemegang hak cipta yang sah.'
+        content: 'Kliprava disediakan semata-mata untuk penggunaan pribadi yang wajar (personal fair use), tujuan edukasi, atau pencadangan arsip konten milik Anda sendiri. Pengguna dilarang memanfaatkan alat ini untuk tujuan komersial tanpa izin pemegang hak cipta yang sah.'
       },
       {
         heading: '3. Tanggung Jawab Hak Cipta',
-        content: 'Pengguna bertanggung jawab penuh atas segala konten yang diunduh atau diproses melalui alat ini. OmniKlip tidak bertanggung jawab atas tindakan penyalahgunaan konten oleh pengguna akhir yang melanggar hak cipta pihak ketiga.'
+        content: 'Pengguna bertanggung jawab penuh atas segala konten yang diunduh atau diproses melalui alat ini. Kliprava tidak bertanggung jawab atas tindakan penyalahgunaan konten oleh pengguna akhir yang melanggar hak cipta pihak ketiga.'
       },
       {
         heading: '4. Batasan Tanggung Jawab Teknis',
-        content: 'Layanan OmniKlip disediakan berdasarkan prinsip "sebagaimana adanya" (as is) dan "sebagaimana tersedia" (as available). Kami tidak memberikan jaminan bahwa layanan akan selalu bebas gangguan, bebas kesalahan, atau selalu kompatibel dengan perubahan API platform pihak ketiga di masa mendatang.'
+        content: 'Layanan Kliprava disediakan berdasarkan prinsip "sebagaimana adanya" (as is) dan "sebagaimana tersedia" (as available). Kami tidak memberikan jaminan bahwa layanan akan selalu bebas gangguan, bebas kesalahan, atau selalu kompatibel dengan perubahan API platform pihak ketiga di masa mendatang.'
       }
     ]
   },
@@ -294,7 +294,7 @@ const LEGAL_DOCS = {
     sections: [
       {
         heading: '1. Penafian Afiliasi',
-        content: 'OmniKlip adalah proyek perangkat lunak independen dan TIDAK berafiliasi, didukung, disponsori, atau secara resmi terhubung dengan YouTube, Google LLC, TikTok, ByteDance Ltd, Meta Platforms Inc. (Instagram & Facebook), X Corp. (Twitter), maupun Xiaohongshu / Rednote.'
+        content: 'Kliprava adalah proyek perangkat lunak independen dan TIDAK berafiliasi, didukung, disponsori, atau secara resmi terhubung dengan YouTube, Google LLC, TikTok, ByteDance Ltd, Meta Platforms Inc. (Instagram & Facebook), X Corp. (Twitter), maupun Xiaohongshu / Rednote.'
       },
       {
         heading: '2. Hak Merek Dagang & Konten',
@@ -619,7 +619,7 @@ export default function App() {
           downloadFilename = `${safeTitle || 'YouTube_Video'}.${format}`;
         }
       } else {
-        downloadFilename = `OmniKlip_${fmt(start).replace(':', '-')}_${fmt(end).replace(':', '-')}.${format}`;
+        downloadFilename = `Kliprava_${fmt(start).replace(':', '-')}_${fmt(end).replace(':', '-')}.${format}`;
       }
 
       a.download = downloadFilename;
@@ -671,13 +671,13 @@ export default function App() {
       <header className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-5 sm:pt-7 flex items-center justify-between gap-2">
         <div className="flex items-center gap-3 min-w-0">
           <div className="relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#080B14]/90 p-1.5 shadow-xl shadow-rose-500/25 border border-white/20 hover:scale-105 hover:border-cyan-400/50 transition-all cursor-pointer shrink-0 overflow-hidden group">
-            <img src="/logo-app.png" alt="OmniKlip Logo" className="w-full h-full object-contain rounded-xl drop-shadow-md group-hover:scale-110 transition-transform duration-300" />
+            <img src="/logo-app.png" alt="Kliprava Logo" className="w-full h-full object-contain rounded-xl drop-shadow-md group-hover:scale-110 transition-transform duration-300" />
             <Sparkles size={13} className="absolute -top-1 -right-1 text-cyan-300 animate-pulse pointer-events-none" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-display text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-rose-500 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                OmniKlip<span className="text-rose-500">.</span>
+                Kliprava<span className="text-rose-500">.</span>
               </span>
               <span className="inline-flex px-2 py-0.5 text-[9px] sm:text-[10px] font-mono font-bold uppercase rounded-md bg-rose-500/15 text-rose-500 dark:text-rose-400 border border-rose-500/25 tracking-wider">
                 STUDIO 3.5
@@ -1496,7 +1496,7 @@ export default function App() {
         </section>
 
         {/* ============================================================== */}
-        {/* 5. WHY CHOOSE OMNIKLIP (FEATURE HIGHLIGHTS)                     */}
+        {/* 5. WHY CHOOSE KLIPRAVA (FEATURE HIGHLIGHTS)                     */}
         {/* ============================================================== */}
         <section id="features" className="mt-14 sm:mt-20 scroll-mt-6">
           <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 px-2">
@@ -1504,7 +1504,7 @@ export default function App() {
               <Sparkles size={13} className="text-rose-400" /> Keunggulan Standar Studio
             </div>
             <h2 className="font-display text-xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
-              Mengapa Memilih OmniKlip Studio?
+              Mengapa Memilih Kliprava Studio?
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
               Dibuat dengan teknologi mutakhir untuk memberikan pengalaman unduh dan potong media tercepat, terbersih, dan teraman.
@@ -1584,7 +1584,7 @@ export default function App() {
               Pertanyaan yang Sering Diajukan (FAQ)
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Informasi lengkap mengenai cara kerja, privasi data, dan tips unduh video tanpa watermark di OmniKlip.
+              Informasi lengkap mengenai cara kerja, privasi data, dan tips unduh video tanpa watermark di Kliprava.
             </p>
           </div>
 
@@ -1806,9 +1806,9 @@ function Footer({ onOpenModal, backendPing }) {
           {/* Brand & Description (5 cols) */}
           <div className="md:col-span-5 space-y-3">
             <div className="flex items-center gap-2.5">
-              <img src="/logo-app.png" alt="OmniKlip" className="w-8 h-8 rounded-xl object-contain shadow-md" />
+              <img src="/logo-app.png" alt="Kliprava" className="w-8 h-8 rounded-xl object-contain shadow-md" />
               <span className="font-display text-lg font-black tracking-tight bg-gradient-to-r from-rose-500 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                OmniKlip<span className="text-rose-500">.</span>
+                Kliprava<span className="text-rose-500">.</span>
               </span>
               <span className="text-[9px] font-mono font-bold uppercase rounded px-1.5 py-0.5 bg-rose-500/15 text-rose-500 dark:text-rose-400 border border-rose-500/25">
                 STUDIO 3.5
@@ -1840,7 +1840,7 @@ function Footer({ onOpenModal, backendPing }) {
               </li>
               <li>
                 <a href="#features" className="hover:text-rose-500 transition-colors">
-                  Keunggulan OmniKlip
+                  Keunggulan Kliprava
                 </a>
               </li>
               <li>
@@ -1891,7 +1891,7 @@ function Footer({ onOpenModal, backendPing }) {
               </li>
             </ul>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-1 leading-relaxed">
-              OmniKlip menghormati hak cipta kreator dan tidak berafiliasi resmi dengan platform pihak ketiga mana pun.
+              Kliprava menghormati hak cipta kreator dan tidak berafiliasi resmi dengan platform pihak ketiga mana pun.
             </p>
           </div>
 
@@ -1899,7 +1899,7 @@ function Footer({ onOpenModal, backendPing }) {
 
         {/* Bottom bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400 font-mono text-center sm:text-left">
-          <p>© 2026 OmniKlip Studio by Dav'site. Hak cipta dilindungi.</p>
+          <p>© 2026 Kliprava Studio by Dav'site. Hak cipta dilindungi.</p>
           <p className="text-[11px] opacity-80">
             Didesain untuk kecepatan, presisi potong frame-accurate, & tanpa watermark.
           </p>
@@ -1957,7 +1957,7 @@ function LegalModal({ docKey, onClose }) {
         {/* Modal Footer */}
         <div className="px-5 py-3 border-t border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-slate-900/80 flex items-center justify-between">
           <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
-            OmniKlip Studio Legal Compliance
+            Kliprava Studio Legal Compliance
           </span>
           <button
             onClick={onClose}

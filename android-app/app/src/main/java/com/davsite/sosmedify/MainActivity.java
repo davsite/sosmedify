@@ -275,9 +275,9 @@ public class MainActivity extends AppCompatActivity {
             String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
             if (filename == null || filename.isEmpty() || filename.equals("downloadfile.bin")) {
                 if (url.contains(".mp3")) {
-                    filename = "sosmedify_audio_" + System.currentTimeMillis() + ".mp3";
+                    filename = "kliprava_audio_" + System.currentTimeMillis() + ".mp3";
                 } else {
-                    filename = "sosmedify_video_" + System.currentTimeMillis() + ".mp4";
+                    filename = "kliprava_video_" + System.currentTimeMillis() + ".mp4";
                 }
             }
 

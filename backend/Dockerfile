@@ -1,4 +1,4 @@
-# Backend OmniKlip — siap untuk Hugging Face Spaces / Render (Docker)
+# Backend Kliprava — Docker deployment dengan build context backend/
 FROM python:3.12-slim
 
 # ffmpeg & nodejs wajib ada untuk memotong video & menyelesaikan JS challenge yt-dlp
@@ -14,9 +14,9 @@ RUN python -m playwright install --with-deps chromium
 
 COPY . .
 
-# HF Spaces butuh folder yang bisa ditulis oleh user non-root
+# Penyimpanan sementara hasil konversi
 RUN mkdir -p /app/temp_media && chmod 777 /app/temp_media
 
-# HF Spaces memakai port 7860; Render mengisi $PORT sendiri.
+# Host dapat mengatur PORT; default container adalah 8080.
 EXPOSE 8080
 CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]

@@ -1,4 +1,4 @@
-# Backend OmniKlip — Root Dockerfile for Railway / Cloud PaaS
+# Backend Kliprava — Docker deployment for Render, Railway, or a VPS
 FROM python:3.12-slim
 
 # Install ffmpeg & nodejs (wajib untuk JS challenge solver yt-dlp)

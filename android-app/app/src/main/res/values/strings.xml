@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OmniKlip</string>
+    <string name="app_name">Kliprava</string>
     
     <!-- 
-      OMNIKLIP STANDALONE EMBEDDED ENGINE:
+      KLIPRAVA STANDALONE EMBEDDED ENGINE:
       Antarmuka frontend (React 19) ditanamkan 100% secara lokal di dalam file APK 
       (assets/web/index.html) menggunakan WebViewAssetLoader untuk performa instan tanpa latensi web.
     -->

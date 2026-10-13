@@ -274,7 +274,7 @@ def process_and_download_sync(req: ProcessRequest):
         safe_remove(raw_path)
         safe_remove(audio_path)
 
-        download_filename = f"OmniKlip_{int(time.time())}.{ext}"
+        download_filename = f"Kliprava_{int(time.time())}.{ext}"
         is_youtube = any(s in target_url.lower() for s in ("youtube.com", "youtu.be"))
         if is_youtube and info.get("title"):
             clean_title = re.sub(r'[\\/*?:"<>|]', "", str(info["title"])).strip()
@@ -361,7 +361,7 @@ def root():
     return {
         "status": "HEALTHY",
         "app_name": settings.APP_NAME,
-        "message": "OmniKlip Backend API is live and ready."
+        "message": "Kliprava Backend API is live and ready."
     }
 
 

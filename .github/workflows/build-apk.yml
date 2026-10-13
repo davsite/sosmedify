@@ -1,4 +1,4 @@
-name: Build Sosmedify APK
+name: Build Kliprava APK
 
 on:
   workflow_dispatch: # Memungkinkan tombol "Run workflow" manual di GitHub
@@ -35,6 +35,7 @@ jobs:
         run: |
           npm ci
           VITE_BASE_PATH='./' npm run build
+          rm -rf ../android-app/app/src/main/assets/web
           mkdir -p ../android-app/app/src/main/assets/web
           cp -r dist/* ../android-app/app/src/main/assets/web/
 
@@ -60,13 +61,13 @@ jobs:
       - name: Prepare Release APK
         run: |
           mkdir -p release-apk
-          cp android-app/app/build/outputs/apk/debug/*.apk release-apk/sosmedify-v1.0.0.apk
+          cp android-app/app/build/outputs/apk/debug/*.apk release-apk/kliprava-v1.0.0.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Sosmedify-App-Debug
-          path: release-apk/sosmedify-v1.0.0.apk
+          name: Kliprava-App-Debug
+          path: release-apk/kliprava-v1.0.0.apk
           retention-days: 14
 
       - name: Release APK to GitHub Releases
@@ -74,13 +75,13 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           tag_name: v1.0.0
-          name: "📱 Sosmedify Android App v1.0.0 (Standalone Bundled)"
+          name: "📱 Kliprava Android App v1.0.0 (Standalone Bundled)"
           body: |
-            ### 🌿 Sosmedify Android Application (Standalone Bundled Edition)
-            Unduh file APK Sosmedify langsung ke smartphone Android Anda.
+            ### 🌿 Kliprava Android Application (Standalone Bundled Edition)
+            Unduh file APK Kliprava langsung ke smartphone Android Anda.
             
             - **Arsitektur**: Standalone Embedded Assets (Antarmuka React 19 tertanam 100% di dalam APK — Pemuatan instan tanpa memuat live web).
             - **Fitur**: Native Android DownloadManager MP4 & MP3, Cloud API Engine (FastAPI + yt-dlp + FFmpeg), Offline Zen Screen.
-            - **Nama Berkas**: `sosmedify-v1.0.0.apk`
-          files: release-apk/sosmedify-v1.0.0.apk
+            - **Nama Berkas**: `kliprava-v1.0.0.apk`
+          files: release-apk/kliprava-v1.0.0.apk
           generate_release_notes: false
